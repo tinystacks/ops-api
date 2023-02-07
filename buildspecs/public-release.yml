@@ -5,4 +5,4 @@ phases:
       nodejs: 16
   build:
     commands:
-      - echo hello world
+      - bash buildspecs/public-release.sh
