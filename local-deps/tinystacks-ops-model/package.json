@@ -1,0 +1,24 @@
+{
+  "name": "@tinystacks/ops-model",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "npm run generate && tsc",
+    "generate": "openapi -i ./src/index.yml -o ./gen --indent=2",
+    "clean-build": "rm -rf *.tgz && rm -rf ./dist && rm -rf ./gen && npm run build",
+    "prepack": "npm run clean-build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openapi-typescript-codegen": "^0.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}

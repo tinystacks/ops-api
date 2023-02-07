@@ -1,0 +1,12 @@
+TabPanel:
+  allOf:
+    - $ref: './widget.yml#/Widget'
+    - type: object
+      properties:
+        tabs:
+          description: A list of tab widgets to be displayed
+          type: object
+          additionalProperties:
+            $ref: './tab.yml#/Tab'
+      required:
+        - tabs

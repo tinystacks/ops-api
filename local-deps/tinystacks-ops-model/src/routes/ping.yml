@@ -1,0 +1,11 @@
+ping:
+  get:
+    tags:
+      - Service Health 
+    responses:
+      '200':
+        description: Returns the string Healthy Connection in an HTTP 200 response
+        content:
+          text/plain:
+            schema:
+              $ref: '../schemas/ping.yml#/Ping'

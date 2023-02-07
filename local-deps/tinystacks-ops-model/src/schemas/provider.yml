@@ -1,0 +1,10 @@
+Provider:
+  type: object
+  properties:
+    id:
+      type: string
+    type: 
+      type: string
+      description: This describes how type of the provider
+  required:
+    - type

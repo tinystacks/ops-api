@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ApiError = void 0;
+class ApiError extends Error {
+    url;
+    status;
+    statusText;
+    body;
+    request;
+    constructor(request, response, message) {
+        super(message);
+        this.name = 'ApiError';
+        this.url = response.url;
+        this.status = response.status;
+        this.statusText = response.statusText;
+        this.body = response.body;
+        this.request = request;
+    }
+}
+exports.ApiError = ApiError;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQXBpRXJyb3IuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9nZW4vY29yZS9BcGlFcnJvci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFNQSxNQUFhLFFBQVMsU0FBUSxLQUFLO0lBQ2pCLEdBQUcsQ0FBUztJQUNaLE1BQU0sQ0FBUztJQUNmLFVBQVUsQ0FBUztJQUNuQixJQUFJLENBQU07SUFDVixPQUFPLENBQW9CO0lBRTNDLFlBQVksT0FBMEIsRUFBRSxRQUFtQixFQUFFLE9BQWU7UUFDMUUsS0FBSyxDQUFDLE9BQU8sQ0FBQyxDQUFDO1FBRWYsSUFBSSxDQUFDLElBQUksR0FBRyxVQUFVLENBQUM7UUFDdkIsSUFBSSxDQUFDLEdBQUcsR0FBRyxRQUFRLENBQUMsR0FBRyxDQUFDO1FBQ3hCLElBQUksQ0FBQyxNQUFNLEdBQUcsUUFBUSxDQUFDLE1BQU0sQ0FBQztRQUM5QixJQUFJLENBQUMsVUFBVSxHQUFHLFFBQVEsQ0FBQyxVQUFVLENBQUM7UUFDdEMsSUFBSSxDQUFDLElBQUksR0FBRyxRQUFRLENBQUMsSUFBSSxDQUFDO1FBQzFCLElBQUksQ0FBQyxPQUFPLEdBQUcsT0FBTyxDQUFDO0lBQ3pCLENBQUM7Q0FDRjtBQWpCRCw0QkFpQkMiLCJzb3VyY2VzQ29udGVudCI6WyIvKiBpc3RhbmJ1bCBpZ25vcmUgZmlsZSAqL1xuLyogdHNsaW50OmRpc2FibGUgKi9cbi8qIGVzbGludC1kaXNhYmxlICovXG5pbXBvcnQgdHlwZSB7IEFwaVJlcXVlc3RPcHRpb25zIH0gZnJvbSAnLi9BcGlSZXF1ZXN0T3B0aW9ucyc7XG5pbXBvcnQgdHlwZSB7IEFwaVJlc3VsdCB9IGZyb20gJy4vQXBpUmVzdWx0JztcblxuZXhwb3J0IGNsYXNzIEFwaUVycm9yIGV4dGVuZHMgRXJyb3Ige1xuICBwdWJsaWMgcmVhZG9ubHkgdXJsOiBzdHJpbmc7XG4gIHB1YmxpYyByZWFkb25seSBzdGF0dXM6IG51bWJlcjtcbiAgcHVibGljIHJlYWRvbmx5IHN0YXR1c1RleHQ6IHN0cmluZztcbiAgcHVibGljIHJlYWRvbmx5IGJvZHk6IGFueTtcbiAgcHVibGljIHJlYWRvbmx5IHJlcXVlc3Q6IEFwaVJlcXVlc3RPcHRpb25zO1xuXG4gIGNvbnN0cnVjdG9yKHJlcXVlc3Q6IEFwaVJlcXVlc3RPcHRpb25zLCByZXNwb25zZTogQXBpUmVzdWx0LCBtZXNzYWdlOiBzdHJpbmcpIHtcbiAgICBzdXBlcihtZXNzYWdlKTtcblxuICAgIHRoaXMubmFtZSA9ICdBcGlFcnJvcic7XG4gICAgdGhpcy51cmwgPSByZXNwb25zZS51cmw7XG4gICAgdGhpcy5zdGF0dXMgPSByZXNwb25zZS5zdGF0dXM7XG4gICAgdGhpcy5zdGF0dXNUZXh0ID0gcmVzcG9uc2Uuc3RhdHVzVGV4dDtcbiAgICB0aGlzLmJvZHkgPSByZXNwb25zZS5ib2R5O1xuICAgIHRoaXMucmVxdWVzdCA9IHJlcXVlc3Q7XG4gIH1cbn1cbiJdfQ==

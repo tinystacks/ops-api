@@ -45,8 +45,8 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@tinystacks/ops-model": "file:local-deps/tinystacks-ops-model-1.0.0.tgz",
-    "aws-credentials-provider": "file:local-deps/aws-credentials-provider-1.0.0.tgz",
+    "@tinystacks/ops-model": "file:local-deps/tinystacks-ops-model",
+    "aws-credentials-provider": "file:local-deps/aws-credentials-provider",
     "body-parser": "^1.20.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",

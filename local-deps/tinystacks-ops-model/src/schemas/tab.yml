@@ -1,0 +1,15 @@
+Tab:
+  allOf:
+    - $ref: './widget.yml#/Widget'
+    - type: object
+      properties:
+        tabDisplayName:
+          description: A human readable, non-unique name to be displayed
+          type: string
+        widgetIds: 
+          type: array
+          items: 
+            type: string
+      required:
+        - tabDisplayName
+        - widgetIds

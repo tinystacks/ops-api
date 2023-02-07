@@ -1,0 +1,28 @@
+Widget:
+  type: object
+  properties:
+    id: 
+      type: string
+    displayName:
+      description: A human-readable display name, usually used to title a widget
+      type: string
+    type:
+      type: string
+      description: This describes how this widget should be rendered. The "type" should be equivalent to the Object definition's name of the widget you are trying to render.
+    providerId:
+      type: string
+    showDisplayName:
+      description: Whether to show the display name
+      type: boolean
+    description:
+      type: string
+    showDescription:
+      description: Whether to show the description
+      type: boolean
+
+    additionalProperties: {}
+  required:
+    - providerId
+    - displayName
+    - type
+  #TODO navigation
