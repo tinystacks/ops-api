@@ -17,4 +17,4 @@ docker image tag "$appName:$commitSha" "$ecrImageUrl:$commitSha";
 docker image tag "$appName:$version" "$ecrImageUrl:$version";
 docker image tag "$appName:latest" "$ecrImageUrl:latest";
 
-docker push $ecrImageUrl --all-tags;;
+docker push $ecrImageUrl --all-tags;
