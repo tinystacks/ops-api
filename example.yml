@@ -32,6 +32,8 @@ Console:
       region: us-east-1
     MainPageTabPanel:
       type: "TabPanel"
+      provider: 
+        $ref: '#/Console/providers/AwsLocalProvider'
       tabs:
         LogsTab:
           tabDisplayName: Logs

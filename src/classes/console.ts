@@ -63,16 +63,16 @@ class Console extends Parseable implements ConsoleType {
     }, {});
     
     const widgets = Object.entries(widgetsObject).reduce<{ [id: string]: Widget }>((acc, [id, widgetObject]) => {
+      const ref = widgetObject.provider.$ref;
+      const [_hash, _console, _providers, providerId, ...rest] = ref.split('/');
+      if (!ref || !providerId || (Array.isArray(rest) && rest.length > 0)) {
+        throw new Error('Invalid provider reference! Providers must be local references i.e. "#/Console/providers/{ProviderId}"!');
+      }
       // TODO: Replace this with the plugin classes
       if (widgetObject.type === 'AwsCloudWatchMetricGraph') {
-        const ref = widgetObject.provider.$ref;
-        const [_hash, _console, _providers, providerId, ...rest] = ref.split('/');
-        if (!ref || !providerId || (Array.isArray(rest) && rest.length > 0)) {
-          throw new Error('Invalid provider reference! Providers must be local references i.e. "#/Console/providers/{ProviderId}"!');
-        }
         acc[id] = AwsCloudWatchMetricGraph.fromJson({ ...(widgetObject as any) , id, providerId });
       } else {
-        acc[id] = GenericWidget.fromYaml(widgetObject, id);
+        acc[id] = GenericWidget.fromYaml({ ...widgetObject, providerId }, id);
       }
       return acc;
     }, {});
@@ -98,7 +98,9 @@ class Console extends Parseable implements ConsoleType {
     
     const widgets = Object.entries(this.widgets).reduce<{ [id: string]: YamlWidget }>((acc, [id, widget]) => {
       // TODO: Replace this with the plugin classes
-      acc[id] = GenericWidget.fromJson(widget).toYaml();
+      const yamlWidget: YamlWidget = GenericWidget.fromJson(widget).toYaml();
+      yamlWidget.provider = { $ref: `#/Console/providers/${widget.providerId}` };
+      acc[id] = yamlWidget;
       return acc;
     }, {});
     return {
