@@ -3,6 +3,12 @@ phases:
   install:
     runtime-versions:
       nodejs: 16
+    commands:
+      - docker version
+      - curl -JLO https://github.com/docker/buildx/releases/download/v0.10.2/buildx-v0.10.2.linux-amd64
+      - mkdir -p ~/.docker/cli-plugins
+      - mv buildx-v0.10.2.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+      - chmod a+rx ~/.docker/cli-plugins/docker-buildx
   build:
     commands:
       - bash buildspecs/dev-build.sh
