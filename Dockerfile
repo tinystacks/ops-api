@@ -10,7 +10,12 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm run clean-build
+RUN npm run clean
+RUN npm ci
+RUN ls node_modules/.bin
+RUN ls node_modules/.bin/tsc
+RUN npm run build
+# RUN npm run clean-build
 # Uncomment once core-plugins repo exists and is installable
 # RUN npm prune --production
 
