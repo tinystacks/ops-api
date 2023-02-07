@@ -15,6 +15,7 @@ RUN npm ci
 RUN ls node_modules/.bin
 RUN ls node_modules/.bin/tsc
 RUN npm run build
+RUN rm -rf src
 # RUN npm run clean-build
 # Uncomment once core-plugins repo exists and is installable
 # RUN npm prune --production
