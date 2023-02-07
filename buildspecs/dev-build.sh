@@ -11,7 +11,7 @@ ecrImageUrl="${ecrEndpoint}/${appName}";
 
 docker login -u AWS -p $(aws ecr get-login-password --region $region) $ecrEndpoint;
 
-docker build --progress plain -t "$appName:$commitSha" -t "$appName:$version" -t "$appName:latest" . || exit 1;
+docker buildx build --platform linux/amd64,linux/arm64 --progress plain -t "$appName:$commitSha" -t "$appName:$version" -t "$appName:latest" . || exit 1;
 
 docker image tag "$appName:$commitSha" "$ecrImageUrl:$commitSha";
 docker image tag "$appName:$version" "$ecrImageUrl:$version";
