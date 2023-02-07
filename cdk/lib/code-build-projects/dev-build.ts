@@ -53,7 +53,7 @@ class DevBuild extends Construct {
       projectName,
       buildSpec: BuildSpec.fromSourceFilename('buildspecs/dev-build.yml'),
       environment: {
-        buildImage: LinuxBuildImage.fromCodeBuildImageId('aws/codebuild/amazonlinux2-x86_64-standard:4.0'),
+        buildImage: LinuxBuildImage.fromCodeBuildImageId('aws/codebuild/standard:6.0'),
         computeType: ComputeType.SMALL,
         privileged: true,
         environmentVariables: {
@@ -88,7 +88,8 @@ class DevBuild extends Construct {
         'ecr:Describe*',
         'ecr:List*',
         'ecr:GetAuthorizationToken',
-        'sts:GetServiceBearerToken'
+        'sts:GetServiceBearerToken',
+        'sts:GetCallerIdentity'
       ],
       resources: ['*']
     }));

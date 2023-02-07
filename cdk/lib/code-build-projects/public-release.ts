@@ -23,7 +23,7 @@ import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { name } from '../../../package.json';
 import { CfnPublicRepository } from 'aws-cdk-lib/aws-ecr';
 
-class DevBuild extends Construct {
+class PublicRelease extends Construct {
   constructor (scope: Construct) {
     super(scope, 'PublicRelease');
 
@@ -60,7 +60,7 @@ class DevBuild extends Construct {
       projectName,
       buildSpec: BuildSpec.fromSourceFilename('buildspecs/public-release.yml'),
       environment: {
-        buildImage: LinuxBuildImage.fromCodeBuildImageId('aws/codebuild/amazonlinux2-x86_64-standard:4.0'),
+        buildImage: LinuxBuildImage.fromCodeBuildImageId('aws/codebuild/standard:6.0'),
         computeType: ComputeType.SMALL,
         privileged: true,
         environmentVariables: {
@@ -88,7 +88,8 @@ class DevBuild extends Construct {
         'ecr-public:Get*',
         'ecr-public:Describe*',
         'ecr-public:List*',
-        'sts:GetServiceBearerToken'
+        'sts:GetServiceBearerToken',
+        'sts:GetCallerIdentity'
       ],
       resources: ['*']
     }));
@@ -110,5 +111,5 @@ class DevBuild extends Construct {
 }
 
 export {
-  DevBuild
+  PublicRelease
 };
