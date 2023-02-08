@@ -17,7 +17,7 @@ import {
   Source
 } from 'aws-cdk-lib/aws-codebuild';
 import { RemovalPolicy } from 'aws-cdk-lib';
-import { name } from '../../package.json';
+import { name } from '../../../package.json';
 import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
