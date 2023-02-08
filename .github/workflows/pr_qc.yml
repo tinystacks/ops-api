@@ -19,8 +19,6 @@ jobs:
           node-version: 18
       - name: Quality Checks
         run: |
-          ls
-          ls local-deps
           npm i;
           npm run qa;
           npm run build;
