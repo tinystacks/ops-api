@@ -17,12 +17,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 18
-          cache: 'npm'
       - name: Quality Checks
         run: |
           ls
           ls local-deps
-          npm ci;
+          npm i;
           npm run qa;
           npm run build;
           node .github/workflows/dependency-check.js;
