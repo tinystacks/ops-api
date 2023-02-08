@@ -2,4 +2,4 @@ version: 0.2
 phases:
   build:
     commands:
-      - bash buildspecs/dev-build.sh
+      - bash buildspecs/dev-release.sh

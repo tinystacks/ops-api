@@ -84,6 +84,18 @@ class PublicRelease extends Construct {
 
     codebuildProject.addToRolePolicy(new PolicyStatement({
       actions: [
+        'ecr:BatchGet*',
+        'ecr:Get*',
+        'ecr:Describe*',
+        'ecr:List*',
+        'ecr:GetAuthorizationToken',
+        'sts:GetServiceBearerToken',
+        'sts:GetCallerIdentity'
+      ],
+      resources: ['*']
+    }));
+    codebuildProject.addToRolePolicy(new PolicyStatement({
+      actions: [
         'ecr-public:BatchGet*',
         'ecr-public:Get*',
         'ecr-public:Describe*',

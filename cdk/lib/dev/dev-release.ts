@@ -12,32 +12,29 @@ import {
   BuildEnvironmentVariableType,
   BuildSpec,
   ComputeType,
-  EventAction,
-  FilterGroup,
   LinuxBuildImage,
   Project,
   Source
 } from 'aws-cdk-lib/aws-codebuild';
 import { RemovalPolicy } from 'aws-cdk-lib';
-import { name } from '../../../package.json';
-import { Repository, TagStatus } from 'aws-cdk-lib/aws-ecr';
+import { name } from '../../package.json';
+import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
-class DevBuild extends Construct {
-  constructor (scope: Construct) {
-    super(scope, 'DevBuild');
+interface DevReleaseProps {
+  ecrRepo: Repository
+}
 
-    const ecrRepo = new Repository(this, constructId(name, 'devRepo'), {
-      repositoryName: name,
-      removalPolicy: RemovalPolicy.DESTROY,
-      imageScanOnPush: true
-    });
-    ecrRepo.addLifecycleRule({
-      tagStatus: TagStatus.UNTAGGED,
-      maxImageCount: 25 
-    });
+class DevRelease extends Construct {
+  codebuildProject: Project;
+  constructor (scope: Construct, id: string, props: DevReleaseProps) {
+    super(scope, id);
 
-    const projectName = `${name}-dev-build`;
+    const {
+      ecrRepo
+    } = props;
+
+    const projectName = `${name}-dev-manifest-release`;
 
     const logGroupName = generateName({
       identifiers: [projectName, 'logs'],
@@ -49,9 +46,9 @@ class DevBuild extends Construct {
       removalPolicy: RemovalPolicy.DESTROY
     });
 
-    const codebuildProject = new Project(this, constructId(projectName), {
+    this.codebuildProject = new Project(this, constructId(projectName), {
       projectName,
-      buildSpec: BuildSpec.fromSourceFilename('buildspecs/dev-build.yml'),
+      buildSpec: BuildSpec.fromSourceFilename('buildspecs/dev-release.yml'),
       environment: {
         buildImage: LinuxBuildImage.fromCodeBuildImageId('aws/codebuild/standard:6.0'),
         computeType: ComputeType.SMALL,
@@ -60,6 +57,14 @@ class DevBuild extends Construct {
           NPM_TOKEN: {
             type: BuildEnvironmentVariableType.SECRETS_MANAGER,
             value: '/CodeBuild/NPM_TOKEN'
+          },
+          IMAGE_TAG: {
+            type: BuildEnvironmentVariableType.PLAINTEXT,
+            value: 'latest'
+          },
+          VERSION: {
+            type: BuildEnvironmentVariableType.PLAINTEXT,
+            value: 'latest'
           }
         }
       },
@@ -71,17 +76,11 @@ class DevBuild extends Construct {
       source: Source.gitHub({
         owner: 'tinystacks',
         repo: 'ops-api',
-        branchOrRef: 'main',
-        webhook: true,
-        webhookFilters: [
-          FilterGroup
-            .inEventOf(EventAction.PUSH)
-            .andBranchIs('main')
-        ]
+        branchOrRef: 'main'
       })
     });
 
-    codebuildProject.addToRolePolicy(new PolicyStatement({
+    this.codebuildProject.addToRolePolicy(new PolicyStatement({
       actions: [
         'ecr:BatchGet*',
         'ecr:Get*',
@@ -93,7 +92,7 @@ class DevBuild extends Construct {
       ],
       resources: ['*']
     }));
-    codebuildProject.addToRolePolicy(new PolicyStatement({
+    this.codebuildProject.addToRolePolicy(new PolicyStatement({
       actions: [
         'ecr:BatchCheckLayerAvailability',
         'ecr:CompleteLayerUpload',
@@ -108,5 +107,5 @@ class DevBuild extends Construct {
 }
 
 export {
-  DevBuild
+  DevRelease
 };
