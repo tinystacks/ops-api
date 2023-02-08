@@ -33,4 +33,13 @@ docker manifest create $ecrImageUrl:$version $ecrImageUrl:$armTag $ecrImageUrl:$
 docker manifest annotate --arch arm64 $ecrImageUrl:$version $ecrImageUrl:$armTag
 docker manifest annotate --arch amd64 $ecrImageUrl:$version $ecrImageUrl:$x86Tag
 docker manifest push $ecrImageUrl:$version
-docker manifest inspect $ecrImageUrl:$version
+
+if [ "$version" != "latest" ]
+  then
+    docker manifest create $ecrImageUrl:latest $ecrImageUrl:$armTag $ecrImageUrl:$x86Tag    
+    docker manifest annotate --arch arm64 $ecrImageUrl:latest $ecrImageUrl:$armTag
+    docker manifest annotate --arch amd64 $ecrImageUrl:latest $ecrImageUrl:$x86Tag
+    docker manifest push $ecrImageUrl:latest
+fi
+
+docker manifest inspect $ecrImageUrl:latest
