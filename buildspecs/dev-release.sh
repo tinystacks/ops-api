@@ -4,7 +4,6 @@ callerIdentity=$(aws sts get-caller-identity);
 accountId=$(jq -r .Account <<< $callerIdentity);
 version="${VERSION:-latest}";
 appName=$(cat ./package.json | jq -r .name);
-commitSha=$(git rev-parse HEAD);
 region="${AWS_REGION:-us-east-1}";
 ecrEndpoint="${accountId}.dkr.ecr.${region}.amazonaws.com";
 ecrImageUrl="${ecrEndpoint}/${appName}";
@@ -32,6 +31,6 @@ fi
 export DOCKER_CLI_EXPERIMENTAL=enabled       
 docker manifest create $ecrImageUrl:$version $ecrImageUrl:$armTag $ecrImageUrl:$x86Tag    
 docker manifest annotate --arch arm64 $ecrImageUrl:$version $ecrImageUrl:$armTag
-docker manifest annotate --arch amd64 $ecrImageUrl:$version $ecrImageUrl:x86Tag
+docker manifest annotate --arch amd64 $ecrImageUrl:$version $ecrImageUrl:$x86Tag
 docker manifest push $ecrImageUrl:$version
 docker manifest inspect $ecrImageUrl:$version
