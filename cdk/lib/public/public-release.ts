@@ -67,6 +67,14 @@ class PublicRelease extends Construct {
           NPM_TOKEN: {
             type: BuildEnvironmentVariableType.SECRETS_MANAGER,
             value: '/CodeBuild/NPM_TOKEN'
+          },
+          SOURCE_TAG: {
+            type: BuildEnvironmentVariableType.PLAINTEXT,
+            value: 'latest'
+          },
+          VERSION: {
+            type: BuildEnvironmentVariableType.PLAINTEXT,
+            value: 'latest'
           }
         }
       },
