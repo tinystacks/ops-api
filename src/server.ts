@@ -6,7 +6,9 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
+import cors from 'cors';
 import { errorMiddleware } from './middleware';
+import { authenticationMiddleware } from './middleware/auth-n';
 
 async function startServer () {
   if (process.env.NODE_ENV === 'dev') {
@@ -19,12 +21,12 @@ async function startServer () {
     }
   }
   
-  // Constants
   const PORT = process.env.PORT || 8000;
   
-  // App handlers
   const app: Application = express();
   app.use(json());
+  app.use(authenticationMiddleware);
+  app.use(cors());
   
   const rootDocLocation = require.resolve('@tinystacks/ops-model/src/index.yml');
   const apiDoc = yaml.parse(readFileSync(rootDocLocation, 'utf-8'));
@@ -55,10 +57,6 @@ async function startServer () {
     const responseBody = 'Hello world from ops-console-api!';
     response.status(200).send(responseBody);
   });
-  
-  // app.get('/*', (_request: Request, response: Response) => {
-  //   response.status(204).send();
-  // });
   
   app.use(errorMiddleware);
   

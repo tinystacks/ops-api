@@ -1,5 +1,7 @@
 FROM public.ecr.aws/docker/library/node:18-slim
 
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter /lambda-adapter /opt/extensions/lambda-adapter
+
 ARG NODE_ENV
 ENV NODE_ENV=${NODE_ENV}
 ARG CONFIG_PATH

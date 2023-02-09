@@ -21,6 +21,8 @@
   },
   "devDependencies": {
     "@aws-sdk/client-cloudwatch": "^3.264.0",
+    "@types/cached": "^6.0.0",
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.16",
     "@types/http-errors": "^2.0.1",
     "@types/jest": "^29.4.0",
@@ -45,9 +47,12 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@aws-sdk/client-api-gateway": "^3.267.0",
     "@tinystacks/ops-model": "file:local-deps/tinystacks-ops-model",
     "aws-credentials-provider": "file:local-deps/aws-credentials-provider",
     "body-parser": "^1.20.1",
+    "cached": "^6.1.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-openapi": "^12.1.0",
