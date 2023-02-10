@@ -11,7 +11,7 @@ import { FlatMap, Json, YamlConsole, YamlPage, YamlProvider, YamlWidget } from '
 import Widget from './widget';
 import GenericWidget from './generic-widget';
 // Directly imported for now even though this is wrong.
-import AwsCredentialsProvider, { AwsCloudWatchMetricGraph } from '@tinystacks/ops-aws-core-plugins';
+import { AwsCredentialsProvider, AwsCloudWatchMetricGraph } from '@tinystacks/ops-aws-core-plugins';
 
 
 class Console extends Parseable implements ConsoleType {
