@@ -28,7 +28,10 @@ async function fetchApiKey () {
 
 async function validateApiKey (request: Request) {
   const authHeader = request.headers['Authorization'];
-  if (!authHeader) throw HttpError.Unauthorized();
+  if (!authHeader) {
+    console.error('No Authorization header included in the request!');
+    throw HttpError.Unauthorized();
+  }
 
   const apiKeyId = process.env.API_KEY_ID;
   if (!apiKeyId) {
@@ -38,7 +41,10 @@ async function validateApiKey (request: Request) {
   
   const apiKeySecret = await cache.getOrElse(apiKeyId, fetchApiKey);
 
-  if (apiKeySecret !== authHeader) throw HttpError.Unauthorized();
+  if (apiKeySecret !== authHeader) {
+    console.error('Invalid Authorization header included in the request!');
+    throw HttpError.Unauthorized();
+  }
 }
 
 export async function authenticationMiddleware (request: Request, response: Response, next: NextFunction) {
