@@ -19,4 +19,4 @@ RUN rm -rf ./src
 
 
 EXPOSE 8000
-CMD ["npm", "start"]
+CMD ["npm", "--logs-dir=/tmp/npm-logs start"]
