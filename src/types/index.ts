@@ -1,5 +1,5 @@
 import {
-  AwsProfileProvider,
+  AwsCredentialsProvider,
   Console,
   Page,
   Provider,
@@ -27,7 +27,7 @@ type YamlPage = Omit<Page, 'widgetIds'> &  {
   widgets: Ref[];
 }
 
-type YamlProvider = Provider | AwsProfileProvider;
+type YamlProvider = Provider | AwsCredentialsProvider;
 
 type YamlConsoleProperties = Omit<Console, 'providers' | 'pages' | 'widgets'> & {
   providers: {
