@@ -28,6 +28,7 @@ async function fetchApiKey () {
 
 async function validateApiKey (request: Request) {
   const authHeader = request.headers['Authorization'];
+  console.debug('Headers: ', Object.keys(request.headers));
   if (!authHeader) {
     console.error('No Authorization header included in the request!');
     throw HttpError.Unauthorized();
