@@ -2,4 +2,6 @@ version: 0.2
 phases:
   build:
     commands:
+      - 'npm config set @tinystacks:registry https://npm.pkg.github.com/'
+      - 'npm config set //npm.pkg.github.com/:_authToken $NPM_TOKEN'
       - bash buildspecs/dev-build.sh
