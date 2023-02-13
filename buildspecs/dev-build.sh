@@ -9,6 +9,11 @@ region="${AWS_REGION:-us-east-1}";
 ecrEndpoint="${accountId}.dkr.ecr.${region}.amazonaws.com";
 ecrImageUrl="${ecrEndpoint}/${appName}";
 
+npm config set @tinystacks:registry https://npm.pkg.github.com/
+npm config set //npm.pkg.github.com/:_authToken $NPM_TOKEN
+mv ./.npmrc ./.npmrc.dev
+mv ./.npmrc.prod ./.npmrc
+
 docker login -u AWS -p $(aws ecr get-login-password --region $region) $ecrEndpoint;
 
 docker build \
