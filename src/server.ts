@@ -10,6 +10,16 @@ import cors from 'cors';
 import { errorMiddleware } from './middleware';
 import { authenticationMiddleware } from './middleware/auth-n';
 
+function shutdown (server: any) {
+  server.close((error: Error) => {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+    process.exit(0);
+  });
+}
+
 async function startServer () {
   if (process.env.NODE_ENV === 'dev') {
     console.debug('Running in dev mode; sourcing with dotenv.');
@@ -70,8 +80,18 @@ async function startServer () {
   app.use(errorMiddleware);
   
   console.debug('Listenting to port.');
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
+  });
+  
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT. Exiting gracefully...');
+    shutdown(server);
+  });
+  process.on('SIGTERM', () => {
+    console.log('\n');
+    console.log('Received SIGTERM. Exiting gracefully...');
+    shutdown(server);
   });
 }
 console.debug('Starting server...');
