@@ -48,8 +48,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.267.0",
-    "@tinystacks/ops-model": "file:local-deps/tinystacks-ops-model",
-    "aws-credentials-provider": "file:local-deps/aws-credentials-provider",
+    "@tinystacks/ops-model": "1.0.0",
+    "@tinystacks/ops-aws-core-plugins": "^1.0.0",
     "body-parser": "^1.20.1",
     "cached": "^6.1.0",
     "cors": "^2.8.5",

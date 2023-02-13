@@ -11,8 +11,7 @@ import { FlatMap, Json, YamlConsole, YamlPage, YamlProvider, YamlWidget } from '
 import Widget from './widget';
 import GenericWidget from './generic-widget';
 // Directly imported for now even though this is wrong.
-import AwsCredentialsProvider from 'aws-credentials-provider';
-import { AwsCloudWatchMetricGraph } from '../example-plugins/aws-cloud-watch-metric-graph';
+import { AwsCredentialsProvider, AwsCloudWatchMetricGraph } from '@tinystacks/ops-aws-core-plugins';
 
 
 class Console extends Parseable implements ConsoleType {
@@ -53,7 +52,11 @@ class Console extends Parseable implements ConsoleType {
     const providers = Object.entries(providersObject).reduce<{ [id: string]: Provider }>((acc, [id, provider]) => {
       if (provider.type === 'AwsCredentialsProvider') {
         acc[id] = {
-          ...new AwsCredentialsProvider(id, (provider as any).credentials),
+          ...new AwsCredentialsProvider({
+            id, 
+            credentials: (provider as any).credentials,
+            type: provider.type
+          }),
           type: provider.type
         };
       } else {
@@ -130,8 +133,11 @@ class Console extends Parseable implements ConsoleType {
     const providers = Object.entries(providersObject).reduce<{ [id: string]: Provider }>((acc, [id, provider]) => {
       if (provider.type === 'AwsCredentialsProvider') {
         acc[id] = {
-          ...new AwsCredentialsProvider(id, (provider as any).credentials),
-          type: provider.type
+          ...new AwsCredentialsProvider({
+            id, 
+            credentials: (provider as any).credentials,
+            type: provider.type
+          }),
         };
       } else {
         acc[id] = provider;
