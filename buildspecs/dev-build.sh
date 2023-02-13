@@ -10,7 +10,6 @@ ecrEndpoint="${accountId}.dkr.ecr.${region}.amazonaws.com";
 ecrImageUrl="${ecrEndpoint}/${appName}";
 
 echo "Configuring NPM registry."
-echo "Length of npm token (should be 40): ${#NPM_TOKEN}"
 npm config set @tinystacks:registry https://npm.pkg.github.com/
 npm config set //npm.pkg.github.com/:_authToken $NPM_TOKEN
 mv ./.npmrc ./.npmrc.dev
@@ -20,6 +19,7 @@ docker login -u AWS -p $(aws ecr get-login-password --region $region) $ecrEndpoi
 
 docker build \
   --progress plain \
+  --build-arg NPM_TOKEN=${NPM_TOKEN} \
   -t "$appName:$commitSha-${ARCH}" \
   -t "$appName:$version-${ARCH}" \
   -t "$appName:latest-${ARCH}" . \
