@@ -1,6 +1,6 @@
 import { Console as ConsoleType } from '@tinystacks/ops-model';
 import ConsoleClient from '../clients/console-client';
-import Console from '../classes/console';
+import Console from '@tinystacks/ops-core';
 
 const ConsoleController = {
   async getConsoles (): Promise<ConsoleType[]> {

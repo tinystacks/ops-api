@@ -1,6 +1,6 @@
 import yaml from 'js-yaml';
 import isNil from 'lodash.isnil';
-import Console from '../../classes/console';
+import Console from '@tinystacks/ops-core';
 import HttpError from 'http-errors';
 import {
   writeFileSync

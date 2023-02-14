@@ -1,4 +1,4 @@
-import Console from '../../classes/console';
+import Console from '@tinystacks/ops-core';
 import LocalConsoleClient from './local';
 
 /**
