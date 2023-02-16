@@ -15,7 +15,7 @@ import { YamlConsole } from '@tinystacks/ops-core';
 // TODO: should we make this a class that implement a ConsoleClient interface?
 const LocalConsoleClient = {
   async getLocalConsole (): Promise<ConsoleParser> {
-    const configPath = process.env.CONFIG_PATH || './example.yml';
+    const configPath = process.env.CONFIG_PATH;
     if (configPath) {
       const configFilePath = resolvePath(configPath);
       // console.debug('configFilePath: ', configFilePath);
