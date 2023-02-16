@@ -10,21 +10,21 @@ import {
   resolve as resolvePath
 } from 'path';
 import FsUtils from '../../utils/fs-utils';
-import { YamlConsoleProperties } from '@tinystacks/ops-core';
+import { YamlConsole } from '@tinystacks/ops-core';
 
 // TODO: should we make this a class that implement a ConsoleClient interface?
 const LocalConsoleClient = {
   async getLocalConsole (): Promise<ConsoleParser> {
-    const configPath = process.env.CONFIG_PATH;
+    const configPath = process.env.CONFIG_PATH || './example.yml';
     if (configPath) {
       const configFilePath = resolvePath(configPath);
       // console.debug('configFilePath: ', configFilePath);
       const configFile = FsUtils.tryToReadFile(configFilePath);
       if (!configFile) throw HttpError.NotFound(`Cannot fetch consoles! Config file ${configPath} not found!`);
-      const configJson = yaml.load(configFile.toString()) as YamlConsoleProperties;
+      const configJson = yaml.load(configFile.toString()) as YamlConsole;
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
-        const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
+        const consoleType: ConsoleType = ConsoleParser.parse(configJson.Console); 
         return ConsoleParser.fromJson(consoleType);
       }
       throw HttpError.InternalServerError('Cannot fetch consoles! The contents of the config file was empty or invalid!');
