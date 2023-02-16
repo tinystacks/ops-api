@@ -1,4 +1,4 @@
-import { ConsoleParser, Console } from '@tinystacks/ops-core';
+import { ConsoleParser } from '@tinystacks/ops-core';
 import LocalConsoleClient from './local';
 
 /**

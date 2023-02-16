@@ -3,7 +3,8 @@ import HttpError from 'http-errors';
 import ConsoleClient from './console-client';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
-import { Widget } from '@tinystacks/ops-core';
+import { Widget } from '@tinystacks/ops-model';
+import { WidgetParser } from '@tinystacks/ops-core';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -15,20 +16,18 @@ const WidgetClient = {
     }
     throw error;
   },
-  async getWidget (consoleName: string, widgetId: string): Promise<Widget> {
+  async getWidget (consoleName: string, widgetId: string): Promise<WidgetParser> {
     try {
       const console = await ConsoleClient.getConsole(consoleName);
-      const widget = console.widgets[widgetId];
+      const widget: WidgetParser = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      const provider = console.providers[widget.providerId];
-      widget.provider = provider;
-      await widget.getData();
+      await widget.getData(); //need to get to this!!
       return widget;
     } catch (error) {
       return this.handleError(error);
     }
   },
-  async createWidget (consoleName: string, widget: Widget): Promise<Widget> {
+  async createWidget (consoleName: string, widget: Widget): Promise<WidgetParser> {
     try {
       const console = await ConsoleClient.getConsole(consoleName);
       const widgetId = widget.id || upperFirst(camelCase(widget.displayName));
@@ -42,7 +41,7 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
-  async updateWidget (consoleName: string, widgetId: string, widget: Widget): Promise<Widget> {
+  async updateWidget (consoleName: string, widgetId: string, widget: Widget): Promise<WidgetParser> {
     try {
       const console = await ConsoleClient.getConsole(consoleName);
       const existingWidget = console.widgets[widgetId];
@@ -56,7 +55,7 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
-  async deleteWidget (consoleName: string, widgetId: string): Promise<Widget> {
+  async deleteWidget (consoleName: string, widgetId: string): Promise<WidgetParser> {
     try {
       const console = await ConsoleClient.getConsole(consoleName);
       const existingWidget = console.widgets[widgetId];
