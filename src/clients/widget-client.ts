@@ -1,9 +1,9 @@
 import isNil from 'lodash.isnil';
-import Widget from '../classes/widget';
 import HttpError from 'http-errors';
 import ConsoleClient from './console-client';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
+import { Widget } from '@tinystacks/ops-core';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -35,7 +35,7 @@ const WidgetClient = {
       widget.id = widgetId;
       const existingWidget = console.widgets[widgetId];
       if (existingWidget) throw HttpError.Conflict(`Cannot create new widget with id ${widget.id} because a widget with this id already exists on console ${consoleName}!`);
-      console.addWidget(widget);
+      console.addWidget(widget, widgetId);
       await ConsoleClient.saveConsole(console.name, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
@@ -49,7 +49,7 @@ const WidgetClient = {
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot update widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       // No trickery allowed.
       widget.id = widgetId;
-      console.updateWidget(widget);
+      console.updateWidget(widget, widgetId);
       await ConsoleClient.saveConsole(console.name, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {

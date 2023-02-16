@@ -1,6 +1,6 @@
 import { Page as PageType } from '@tinystacks/ops-model';
 import PageClient from '../clients/page-client';
-import Page from '@tinystacks/ops-core';
+import { Page } from '@tinystacks/ops-core';
 
 const PageController = {
   async getPages (consoleName: string): Promise<PageType[]> {

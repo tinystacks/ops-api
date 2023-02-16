@@ -1,6 +1,7 @@
 import yaml from 'js-yaml';
 import isNil from 'lodash.isnil';
-import Console from '@tinystacks/ops-core';
+import { ConsoleParser } from '@tinystacks/ops-core';
+import { Console as ConsoleType } from '@tinystacks/ops-model';
 import HttpError from 'http-errors';
 import {
   writeFileSync
@@ -9,26 +10,29 @@ import {
   resolve as resolvePath
 } from 'path';
 import FsUtils from '../../utils/fs-utils';
-import { YamlConsole } from '../../types';
+import { YamlConsoleProperties } from '@tinystacks/ops-core/dist/types'; //this should be updated!
 
 // TODO: should we make this a class that implement a ConsoleClient interface?
 const LocalConsoleClient = {
-  async getLocalConsole (): Promise<Console> {
+  async getLocalConsole (): Promise<ConsoleParser> {
     const configPath = process.env.CONFIG_PATH;
     if (configPath) {
       const configFilePath = resolvePath(configPath);
       // console.debug('configFilePath: ', configFilePath);
       const configFile = FsUtils.tryToReadFile(configFilePath);
       if (!configFile) throw HttpError.NotFound(`Cannot fetch consoles! Config file ${configPath} not found!`);
-      const configJson = yaml.load(configFile.toString()) as YamlConsole;
+      const configJson = yaml.load(configFile.toString()) as YamlConsoleProperties;
       // console.debug('configJson: ', JSON.stringify(configJson));
-      if (!isNil(configJson)) return Console.fromYaml(configJson);
+      if (!isNil(configJson)) {
+        const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
+        return ConsoleParser.fromJson(consoleType);
+      }
       throw HttpError.InternalServerError('Cannot fetch consoles! The contents of the config file was empty or invalid!');
     }
     throw HttpError.InternalServerError('Cannot fetch consoles! No value was found for CONFIG_PATH!');
   },
-  async saveLocalConsole (console: Console): Promise<Console> {
-    const yamlConsole = console.toYaml();
+  async saveLocalConsole (console: ConsoleParser): Promise<ConsoleParser> {
+    const yamlConsole = ConsoleParser.toYaml(console);
     const consoleYml = yaml.dump(yamlConsole);
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot save console ${console.name}! No value was found for CONFIG_PATH!`);
@@ -41,7 +45,7 @@ const LocalConsoleClient = {
       throw error;
     }
   },
-  async deleteLocalConsole (consoleName: string): Promise<Console> {
+  async deleteLocalConsole (consoleName: string): Promise<ConsoleParser> {
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot delete console ${consoleName}! No value was found for CONFIG_PATH!`);
     try {

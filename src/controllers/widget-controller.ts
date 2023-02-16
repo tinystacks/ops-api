@@ -1,7 +1,7 @@
 import { Widget as WidgetType } from '@tinystacks/ops-model';
 import WidgetClient from '../clients/widget-client';
 // temporary until parser is done and can return instances of plugin classes
-import GenericWidget from '@tinystacks/ops-core';
+import { GenericWidget } from '@tinystacks/ops-core';
 
 const WidgetController = {
   async getWidget (consoleName: string, widgetId: string): Promise<WidgetType> {

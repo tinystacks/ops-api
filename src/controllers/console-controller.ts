@@ -1,17 +1,17 @@
 import { Console as ConsoleType } from '@tinystacks/ops-model';
 import ConsoleClient from '../clients/console-client';
-import Console from '@tinystacks/ops-core';
+import { ConsoleParser } from '@tinystacks/ops-core';
 
 const ConsoleController = {
   async getConsoles (): Promise<ConsoleType[]> {
     return ConsoleClient.getConsoles();
   },
   async postConsole (createConsoleBody: ConsoleType): Promise<ConsoleType> {
-    const console = Console.fromJson(createConsoleBody);
+    const console = ConsoleParser.fromJson(createConsoleBody);
     return ConsoleClient.saveConsole(console.name, console);
   },
   async putConsole (consoleName: string, updateConsoleBody: ConsoleType): Promise<ConsoleType> {
-    const console = Console.fromJson(updateConsoleBody);
+    const console = ConsoleParser.fromJson(updateConsoleBody);
     console.name = consoleName;
     return ConsoleClient.saveConsole(consoleName, console);
   },
