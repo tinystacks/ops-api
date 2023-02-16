@@ -49,8 +49,8 @@
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.267.0",
     "@tinystacks/ops-aws-core-plugins": "^1.0.0",
-    "@tinystacks/ops-core": "0.0.21",
-    "@tinystacks/ops-model": "1.0.1",
+    "@tinystacks/ops-core": "^0.1.2",
+    "@tinystacks/ops-model": "^1.0.1",
     "body-parser": "^1.20.1",
     "cached": "^6.1.0",
     "cors": "^2.8.5",
