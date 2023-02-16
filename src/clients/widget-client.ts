@@ -21,7 +21,7 @@ const WidgetClient = {
       const console = await ConsoleClient.getConsole(consoleName);
       const widget: WidgetParser = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      await widget.getData(); //need to get to this!!
+      await widget.getData();
       return widget;
     } catch (error) {
       return this.handleError(error);

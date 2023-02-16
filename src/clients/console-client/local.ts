@@ -10,7 +10,7 @@ import {
   resolve as resolvePath
 } from 'path';
 import FsUtils from '../../utils/fs-utils';
-import { YamlConsoleProperties } from '@tinystacks/ops-core/dist/types'; //this should be updated!
+import { YamlConsoleProperties } from '@tinystacks/ops-core';
 
 // TODO: should we make this a class that implement a ConsoleClient interface?
 const LocalConsoleClient = {
