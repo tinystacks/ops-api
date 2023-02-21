@@ -8,7 +8,7 @@ import {
 import { APIGateway } from '@aws-sdk/client-api-gateway';
 
 const fiveMinutes = 5 * 60;
-const cache = cached('userEmail', {
+const cache = cached('apiKey', {
   backend: {
     type: 'memory'
   },
