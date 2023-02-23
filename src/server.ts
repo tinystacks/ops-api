@@ -1,14 +1,20 @@
 import express, { Application, Request, Response } from 'express';
-import { json } from 'body-parser';
+import BodyParser from 'body-parser';
 import { initialize } from 'express-openapi';
 import yaml from 'yamljs';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import path, { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
-import { errorMiddleware } from './middleware';
-import { authenticationMiddleware } from './middleware/auth-n';
+import errorMiddleware from './middleware/error.js';
+import { authenticationMiddleware } from './middleware/auth-n.js';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+
+const require = createRequire(import.meta.url);
+
+const { json } = BodyParser;
 
 function shutdown (server: any) {
   server.close((error: Error) => {
@@ -24,7 +30,7 @@ async function startServer () {
   if (process.env.NODE_ENV === 'dev') {
     console.debug('Running in dev mode; sourcing with dotenv.');
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('dotenv').config();
+    (await import('dotenv')).config();
   }
 
   const CONFIG_PATH = process.env.CONFIG_PATH;
@@ -55,6 +61,8 @@ async function startServer () {
   });
   
   console.debug('Initializing express-openapi');
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   await initialize({
     app,
     apiDoc,

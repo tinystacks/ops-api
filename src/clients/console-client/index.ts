@@ -1,5 +1,5 @@
 import { ConsoleParser } from '@tinystacks/ops-core';
-import LocalConsoleClient from './local';
+import LocalConsoleClient from './local.js';
 
 /**
  * TODO: Eventually this becomes a proxy class which based on the environment returns a specific client i.e. local vs github vs s3 etc.

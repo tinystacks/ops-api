@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import PageController from '../../../../controllers/page-controller';
+import PageController from '../../../../controllers/page-controller.js';
 
 export default function () {
   return {

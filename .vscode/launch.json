@@ -1,0 +1,73 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Attach by Process ID",
+        "processId": "${command:PickProcess}",
+        "request": "attach",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "type": "pwa-node"
+      },
+      {
+        "type": "aws-sam",
+        "request": "direct-invoke",
+        "name": "updateGithubAuth",
+        "aws": {
+          "credentials": "profile:ts"
+        },
+        "invokeTarget": {
+          "target": "code",
+          "projectRoot": "lib/lambda",
+          "lambdaHandler": "src/auth-z-service/updateGithubAuth.handler"
+        },
+        "lambda": {
+          "runtime": "nodejs12.x",
+          "payload": {
+            "json": {
+              "headers": {
+                "authorization": "Bearer eyJraWQiOiJ3bXAzUXdLaGNqR1RDUHpvQVUrWUNhb0dkazFwMWtaZEhpU1Z6RXN3NUVJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIxNGMwMGNmOS1hMDIwLTQ2NWEtYTI5Yy0zOWQ0MGYwNGJkYjkiLCJldmVudF9pZCI6IjcwNTQ4YzRmLTgxZTgtNDI4YS05OGViLTk1MjFiNmZhNmNmNCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE2MTU0MTgzMjYsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xX2lCclhxYU9FdiIsImV4cCI6MTYxNTg2NzUwMywiaWF0IjoxNjE1ODYzOTAzLCJqdGkiOiI4NWQwNjRlMS1jNTRmLTQ3OGUtYTRhOS1kNGUxNTliOTczMGMiLCJjbGllbnRfaWQiOiJnZmI1YWJiOGkxaHVzdGdmN3ZwcmVucHIzIiwidXNlcm5hbWUiOiIxNGMwMGNmOS1hMDIwLTQ2NWEtYTI5Yy0zOWQ0MGYwNGJkYjkifQ.jg2kYzNtSpP2qMyiLfP-PXAv97dIZij825MIRqS7oEpMTDkzVaQKUUdlmip_aN6xpeaZlyUN7zmnN710C36BmFEQ4QudRenCjMkOKjFld-iPPRDuk9hn4VG1MJy0i6NPADNJ8rx7uIaqWpRUHwOTYgw6T2MetVcz3DoMzvkmOQpak-UhPkPlrE4HRjzRBQuenBgLHYcs1DFzacTPt4cERSiQ7d7IcO_gduPGxhg3DIbp_yyr2B1piyYnIASMxH_TOBSt1JS0XuXMEutkFTu0Qu-aV0iT1l6QP0O0Y5x_4LwJ06IG7g9iXdWkpJy9Ztmi0hp6hOzFQiUMTSqwwXn8ew"
+              },
+              "body": "{}"
+            }
+          },
+          "environmentVariables": {
+            "USER_TABLE_NAME": "user-auth"
+          }
+        }
+      },
+      {
+        "type": "aws-sam",
+        "request": "direct-invoke",
+        "name": "getGithubAuth",
+        "aws": {
+          "credentials": "profile:ts"
+        },
+        "invokeTarget": {
+          "target": "code",
+          "projectRoot": "lib/lambda",
+          "lambdaHandler": "src/auth-z-service/getGithubAuth.handler"
+        },
+        "lambda": {
+          "runtime": "nodejs12.x",
+          "payload": {
+            "json": {
+              "headers": {
+                "authorization": "Bearer eyJraWQiOiJ3bXAzUXdLaGNqR1RDUHpvQVUrWUNhb0dkazFwMWtaZEhpU1Z6RXN3NUVJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIxNGMwMGNmOS1hMDIwLTQ2NWEtYTI5Yy0zOWQ0MGYwNGJkYjkiLCJldmVudF9pZCI6IjcwNTQ4YzRmLTgxZTgtNDI4YS05OGViLTk1MjFiNmZhNmNmNCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE2MTU0MTgzMjYsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xX2lCclhxYU9FdiIsImV4cCI6MTYxNTg2NzUwMywiaWF0IjoxNjE1ODYzOTAzLCJqdGkiOiI4NWQwNjRlMS1jNTRmLTQ3OGUtYTRhOS1kNGUxNTliOTczMGMiLCJjbGllbnRfaWQiOiJnZmI1YWJiOGkxaHVzdGdmN3ZwcmVucHIzIiwidXNlcm5hbWUiOiIxNGMwMGNmOS1hMDIwLTQ2NWEtYTI5Yy0zOWQ0MGYwNGJkYjkifQ.jg2kYzNtSpP2qMyiLfP-PXAv97dIZij825MIRqS7oEpMTDkzVaQKUUdlmip_aN6xpeaZlyUN7zmnN710C36BmFEQ4QudRenCjMkOKjFld-iPPRDuk9hn4VG1MJy0i6NPADNJ8rx7uIaqWpRUHwOTYgw6T2MetVcz3DoMzvkmOQpak-UhPkPlrE4HRjzRBQuenBgLHYcs1DFzacTPt4cERSiQ7d7IcO_gduPGxhg3DIbp_yyr2B1piyYnIASMxH_TOBSt1JS0XuXMEutkFTu0Qu-aV0iT1l6QP0O0Y5x_4LwJ06IG7g9iXdWkpJy9Ztmi0hp6hOzFQiUMTSqwwXn8ew"
+              }
+            }
+          },
+          "environmentVariables": {
+            "USER_TABLE_NAME": "user-auth"
+          }
+        }
+      },
+      {
+        "command": "cd lib/cdk-service/docker; npm i; npm run build; AWS_PROFILE=ts STAGE=dev STACKS_TABLE=stacks USER_TABLE=user-auth node build/server.js",
+        "name": "Build and launch cdk builder",
+        "request": "launch",
+        "type": "node-terminal"
+      }
+    ]
+  }

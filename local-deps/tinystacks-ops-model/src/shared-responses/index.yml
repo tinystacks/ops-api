@@ -1,6 +1,0 @@
-TinyStacksError:
-  description: The specified resource was not found
-  content:
-    application/json:
-      schema:
-        $ref: '../schemas/tinystacks-error.yml#/TinyStacksError'

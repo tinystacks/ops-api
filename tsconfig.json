@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "ES2022",
     "moduleResolution": "node",
     "declaration": true,
     "strict": true,
@@ -22,7 +22,17 @@
     "resolveJsonModule": true,
     "typeRoots": ["./node_modules/@types"],
     "outDir": "./dist",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "ops-api/*": [
+        "./src/*"
+      ],
+      "ops-api-test/*": [
+        "./test/*"
+      ]
+    }
+    
   },
   "include": ["./src"]
 }

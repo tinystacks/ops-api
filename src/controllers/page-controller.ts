@@ -1,5 +1,5 @@
 import { Page as PageType } from '@tinystacks/ops-model';
-import PageClient from '../clients/page-client';
+import PageClient from '../clients/page-client.js';
 import { PageParser } from '@tinystacks/ops-core';
 
 const PageController = {

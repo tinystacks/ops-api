@@ -1,6 +1,6 @@
 import isNil from 'lodash.isnil';
 import HttpError from 'http-errors';
-import ConsoleClient from './console-client';
+import ConsoleClient from './console-client/index.js';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
 import { Page } from '@tinystacks/ops-model';

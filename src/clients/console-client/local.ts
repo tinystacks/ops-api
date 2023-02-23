@@ -1,7 +1,7 @@
 import yaml from 'js-yaml';
 import isNil from 'lodash.isnil';
 import { ConsoleParser } from '@tinystacks/ops-core';
-import { Console as ConsoleType } from '@tinystacks/ops-model';
+import { Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
 import HttpError from 'http-errors';
 import {
   writeFileSync
@@ -9,8 +9,7 @@ import {
 import {
   resolve as resolvePath
 } from 'path';
-import FsUtils from '../../utils/fs-utils';
-import { YamlConsole } from '@tinystacks/ops-core';
+import FsUtils from '../../utils/fs-utils.js';
 
 // TODO: should we make this a class that implement a ConsoleClient interface?
 const LocalConsoleClient = {
@@ -21,10 +20,10 @@ const LocalConsoleClient = {
       // console.debug('configFilePath: ', configFilePath);
       const configFile = FsUtils.tryToReadFile(configFilePath);
       if (!configFile) throw HttpError.NotFound(`Cannot fetch consoles! Config file ${configPath} not found!`);
-      const configJson = yaml.load(configFile.toString()) as YamlConsole;
+      const configJson = (yaml.load(configFile.toString()) as any).Console as YamlConsole;
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
-        const consoleType: ConsoleType = ConsoleParser.parse(configJson.Console); 
+        const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
         return ConsoleParser.fromJson(consoleType);
       }
       throw HttpError.InternalServerError('Cannot fetch consoles! The contents of the config file was empty or invalid!');
