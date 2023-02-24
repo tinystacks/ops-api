@@ -12,10 +12,25 @@ Console:
       route: main
       widgets:
         - $ref: '#/Console/widgets/SmallMarkdown'
-        - $ref: '#/Console/widgets/BasicMarkdown'
+        - $ref: '#/Console/widgets/MdTabs'
+        # - $ref: '#/Console/widgets/BasicMarkdown'
   widgets:
+    MdTabs:
+      type: Tabs
+      displayName: Markdown Tabs
+      children:
+        - $ref: '#/Console/widgets/BasicMarkdown'
+        - $ref: '#/Console/widgets/VertPanel'
+      tabNames:
+        - 'Tab1'
+        - 'Tab2'
+    VertPanel:
+      type: ColumnPanel
+      displayName: column
+      children:
+        - $ref: '#/Console/widgets/Md1'
+        - $ref: '#/Console/widgets/Md2'
     SmallMarkdown:
-      id: SmallMarkdown
       type: Markdown
       displayName: A smaller markdown window
       text: Well well well what we've got here is some downright straightforward markdown
@@ -24,12 +39,19 @@ Console:
 
         1. [Introduction](https://github.com/tinystacks/precloud/blob/main/README.md#introduction)
             1. [Use cases](https://github.com/tinystacks/precloud/blob/main/README.md#use-cases)
-        
+    Md1:
+      type: Markdown
+      displayName: A smaller markdown window
+      markdown: >
+        ### Not a lotta markdown 1
+    Md2:
+      type: Markdown
+      displayName: A smaller markdown window
+      markdown: >
+        ### Not a lotta markdown 2
     BasicMarkdown:
-      id: BasicMarkdown
       type: Markdown
       displayName: Some Basic Markdown
-      text: Well well well what we've got here is some downright straightforward markdown
       markdown: >
         # precloud - Dynamic tests for infrastructure-as-code
 
@@ -91,4 +113,6 @@ Console:
         ```
   dependencies:
     Markdown: '@tinystacks/ops-core-widgets'
+    Tabs: '@tinystacks/ops-core-widgets'
+    ColumnPanel: '@tinystacks/ops-core-widgets'
     AwsCredentialsProvider: '@tinystacks/ops-aws-core-plugins'
