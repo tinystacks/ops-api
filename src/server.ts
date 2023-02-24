@@ -45,7 +45,7 @@ async function startServer () {
   console.debug('Setting up express and middleware.');
   const app: Application = express();
   app.use(json());
-  app.use(unless(['/', '/ping', '/docs', '/docs/'], authenticationMiddleware));
+  app.use(unless(['/', '/ping', '/docs', '/docs/*'], authenticationMiddleware));
   app.use(cors());
   
   console.debug('Constructing the swagger docs and open api spec.');

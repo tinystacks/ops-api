@@ -4,7 +4,11 @@ type Middleware = (request: Request, response: Response, next: NextFunction) => 
 
 export function unless (paths: string[], middleware: Middleware) {
   return function (request: Request, response: Response, next: NextFunction) {
-    if (paths.find(path => request.path === path)) {
+    if (paths.find(path =>
+      path.endsWith('*') ?
+        request.path.startsWith(path.replaceAll('*', '')) :
+        request.path === path
+    )) {
       return next();
     } else {
       return middleware(request, response, next);
