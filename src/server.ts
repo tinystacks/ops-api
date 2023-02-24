@@ -8,9 +8,10 @@ import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import errorMiddleware from './middleware/error.js';
-import { authenticationMiddleware } from './middleware/auth-n.js';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
+import { unless } from './middleware/filters.js';
+import { authenticationMiddleware } from './middleware/auth-n.js';
 
 const require = createRequire(import.meta.url);
 
@@ -44,7 +45,7 @@ async function startServer () {
   console.debug('Setting up express and middleware.');
   const app: Application = express();
   app.use(json());
-  app.use(authenticationMiddleware);
+  app.use(unless(['/', '/health-check', '/docs'], authenticationMiddleware));
   app.use(cors());
   
   console.debug('Constructing the swagger docs and open api spec.');
