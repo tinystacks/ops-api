@@ -51,8 +51,8 @@
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.267.0",
     "@tinystacks/ops-aws-core-plugins": "^0.0.1",
-    "@tinystacks/ops-core": "file:../ops-core/tinystacks-ops-core-0.0.0-release.tgz",
-    "@tinystacks/ops-core-widgets": "file:../ops-core-widgets/tinystacks-ops-core-widgets-0.0.0-release.tgz",
+    "@tinystacks/ops-core": "0.0.1-release",
+    "@tinystacks/ops-core-widgets": "0.0.1-release",
     "@tinystacks/ops-model": "0.0.0-release",
     "@types/react": "^18.0.28",
     "body-parser": "^1.20.1",
