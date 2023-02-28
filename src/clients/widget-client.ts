@@ -37,7 +37,11 @@ const WidgetClient = {
       widget.id = widgetId;
       const existingWidget = console.widgets[widgetId];
       if (existingWidget) throw HttpError.Conflict(`Cannot create new widget with id ${widget.id} because a widget with this id already exists on console ${consoleName}!`);
-      await console.addWidget(widget, widgetId);
+      // Filter out any junk from the request
+      const widgetDependencySource = console.dependencies[widget.type];
+      const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
+      const newWidget = widgetInstance.toJson();
+      await console.addWidget(newWidget, widgetId);
       await ConsoleClient.saveConsole(console.name, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
@@ -51,7 +55,11 @@ const WidgetClient = {
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot update widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       // No trickery allowed.
       widget.id = widgetId;
-      await console.updateWidget(widget, widgetId);
+      // Filter out any junk from the request
+      const widgetDependencySource = console.dependencies[widget.type];
+      const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
+      const updatedWidget = widgetInstance.toJson();
+      await console.updateWidget(updatedWidget, widgetId);
       await ConsoleClient.saveConsole(console.name, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
