@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import PingController from '../controllers/ping-controller';
+import PingController from '../controllers/ping-controller.js';
 
 export default function () {
   return {

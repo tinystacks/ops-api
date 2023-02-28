@@ -1,5 +1,4 @@
 import { TinyStacksError as TinyStacksErrorType } from '@tinystacks/ops-model';
-import { TinyStacksErrorObject } from '../types';
 
 class TinyStacksError implements TinyStacksErrorType {
   static TinyStacksErrorName = 'TinyStacksError';
@@ -22,7 +21,7 @@ class TinyStacksError implements TinyStacksErrorType {
     this.type = type;
   }
 
-  static fromJson (errorObject: TinyStacksErrorObject): TinyStacksError {
+  static fromJson (errorObject: TinyStacksErrorType): TinyStacksError {
     const {
       message,
       status,

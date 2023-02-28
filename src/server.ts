@@ -1,32 +1,56 @@
 import express, { Application, Request, Response } from 'express';
-import { json } from 'body-parser';
+import BodyParser from 'body-parser';
 import { initialize } from 'express-openapi';
 import yaml from 'yamljs';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import path, { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
-import { errorMiddleware } from './middleware';
+import cors from 'cors';
+import errorMiddleware from './middleware/error.js';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { unless } from './middleware/filters.js';
+import { authenticationMiddleware } from './middleware/auth-n.js';
+
+const require = createRequire(import.meta.url);
+
+const { json } = BodyParser;
+
+function shutdown (server: any) {
+  server.close((error: Error) => {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+    process.exit(0);
+  });
+}
 
 async function startServer () {
   if (process.env.NODE_ENV === 'dev') {
+    console.debug('Running in dev mode; sourcing with dotenv.');
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('dotenv').config();
-    const CONFIG_PATH = process.env.CONFIG_PATH;
-  
-    if (!CONFIG_PATH) {
-      console.warn('No config path specified! API results may be empty.');
-    }
+    (await import('dotenv')).config();
+  }
+
+  const CONFIG_PATH = process.env.CONFIG_PATH;
+
+  if (!CONFIG_PATH) {
+    console.warn('No config path specified! API results may be empty.');
   }
   
-  // Constants
   const PORT = process.env.PORT || 8000;
   
-  // App handlers
+  console.debug('Setting up express and middleware.');
   const app: Application = express();
   app.use(json());
+  app.use(unless(['/', '/ping', '/docs', '/docs/*'], authenticationMiddleware));
+  app.use(cors());
   
+  console.debug('Constructing the swagger docs and open api spec.');
   const rootDocLocation = require.resolve('@tinystacks/ops-model/src/index.yml');
+  console.debug('rootDocLocation: ', rootDocLocation);
   const apiDoc = yaml.parse(readFileSync(rootDocLocation, 'utf-8'));
 
   const swaggerSpec = await resolveRefsAt(rootDocLocation,  {
@@ -37,6 +61,9 @@ async function startServer () {
     }
   });
   
+  console.debug('Initializing express-openapi');
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   await initialize({
     app,
     apiDoc,
@@ -45,25 +72,36 @@ async function startServer () {
     errorMiddleware
   });
   
+  console.debug('Setting /docs route.');
   app.use(
     '/docs',
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec.resolved)
   );
   
+  console.debug('Setting / route.');
   app.get('/', (_request: Request, response: Response) => {
     const responseBody = 'Hello world from ops-console-api!';
     response.status(200).send(responseBody);
   });
   
-  // app.get('/*', (_request: Request, response: Response) => {
-  //   response.status(204).send();
-  // });
-  
+  console.debug('Setting error middleware.');
   app.use(errorMiddleware);
   
-  app.listen(PORT, () => {
+  console.debug('Listenting to port.');
+  const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
   });
+  
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT. Exiting gracefully...');
+    shutdown(server);
+  });
+  process.on('SIGTERM', () => {
+    console.log('\n');
+    console.log('Received SIGTERM. Exiting gracefully...');
+    shutdown(server);
+  });
 }
+console.debug('Starting server...');
 void startServer();

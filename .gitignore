@@ -1,3 +1,11 @@
+/dist
+/dist-test
+/node_modules
+/coverage
+/.env
+# local-deps
+*.tgz
+/store
 dist
 dist-test
 node_modules

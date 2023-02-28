@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import WidgetController from '../../../../controllers/widget-controller';
+import WidgetController from '../../../../controllers/widget-controller.js';
 
 export default function () {
   return {

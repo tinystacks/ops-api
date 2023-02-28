@@ -1,4 +1,12 @@
-node_modules
-test
-scripts
 .github
+buildspecs
+cdk
+node_modules
+scripts
+test
+Dockerfile
+dev.sh
+docker-build.sh
+jest.config.js
+tsconfig.test.json
+example.yml
