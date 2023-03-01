@@ -31,8 +31,8 @@ const LocalConsoleClient = {
     throw HttpError.InternalServerError('Cannot fetch consoles! No value was found for CONFIG_PATH!');
   },
   async saveLocalConsole (console: ConsoleParser): Promise<ConsoleParser> {
-    const yamlConsole = ConsoleParser.toYaml(console);
-    const consoleYml = yaml.dump(yamlConsole);
+    const yamlConsole = await ConsoleParser.toYaml(console);
+    const consoleYml = yaml.dump({ Console: yamlConsole });
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot save console ${console.name}! No value was found for CONFIG_PATH!`);
     try {

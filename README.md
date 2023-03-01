@@ -10,8 +10,14 @@ npm ci
 To run on your local machine:
 
 ```bash
-npm run clean-build;
-npm start;
+npm run local
+```
+
+OR
+
+```bash
+npm run build;
+CONFIG_PATH="./path/to/config.yml" NODE_ENV=dev node ./dist/server.js
 ```
 
 To run in docker:
