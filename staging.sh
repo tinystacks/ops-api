@@ -23,7 +23,8 @@ docker run --name $appName \
   -v $HOME/.aws:/root/.aws \
   -v $(pwd)/store:/config \
   --env CONFIG_PATH="../config/example.yml" \
-  --env NODE_ENV=dev \
+  --env NODE_ENV=production \
+  --env-file ./.env.staging \
   -it \
   -p 8000:8000 \
   --network=ops-console \

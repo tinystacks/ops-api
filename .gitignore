@@ -10,7 +10,7 @@ dist
 dist-test
 node_modules
 coverage
-.env
+.env*
 local-deps
 store
 .DS_Store

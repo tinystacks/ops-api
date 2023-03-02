@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import { initialize } from 'express-openapi';
 import yaml from 'yamljs';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import path, { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
@@ -28,7 +28,7 @@ function shutdown (server: any) {
 }
 
 async function startServer () {
-  if (process.env.NODE_ENV === 'dev') {
+  if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'dev') {
     console.debug('Running in dev mode; sourcing with dotenv.');
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     (await import('dotenv')).config();
