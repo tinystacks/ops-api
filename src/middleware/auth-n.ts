@@ -34,7 +34,6 @@ async function fetchApiKey () {
       apiKey: process.env.API_KEY_ID,
       includeValue: true
     });
-    console.info('Successfully fetched api key!', response.value);
     return response.value;
   } catch (error) {
     console.error('Failed to fetch api key!', error);

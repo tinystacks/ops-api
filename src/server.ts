@@ -28,7 +28,7 @@ function shutdown (server: any) {
 }
 
 async function startServer () {
-  if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'dev') {
+  if (process.env.NODE_ENV === 'dev') {
     console.debug('Running in dev mode; sourcing with dotenv.');
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     (await import('dotenv')).config();
