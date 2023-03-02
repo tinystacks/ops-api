@@ -16,7 +16,7 @@ const WidgetClient = {
     }
     throw error;
   },
-  async getWidget (consoleName: string, widgetId: string): Promise<BaseWidget> {
+  async getWidget (consoleName: string, widgetId: string, overrides?: any): Promise<BaseWidget> {
     try {
       const console = await ConsoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];
@@ -24,7 +24,7 @@ const WidgetClient = {
       const hydratedProviders = (widget.providerIds || []).map((providerId) => {
         return console.providers[providerId];
       });
-      await widget.getData(hydratedProviders);
+      await widget.getData(hydratedProviders, overrides);
       return widget;
     } catch (error) {
       return this.handleError(error);
