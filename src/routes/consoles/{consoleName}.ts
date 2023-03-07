@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import ConsoleController from '../../../controllers/console-controller.js';
+import ConsoleController from '../../controllers/console-controller.js';
 
 export default function () {
   return {
