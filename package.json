@@ -58,7 +58,7 @@
     "@tinystacks/ops-aws-core-plugins": "0.0.4-release",
     "@tinystacks/ops-core": "0.0.4-release",
     "@tinystacks/ops-core-widgets": "0.0.4-release",
-    "@tinystacks/ops-model": "0.0.4-release",
+    "@tinystacks/ops-model": "0.0.5-release",
     "@types/react": "^18.0.28",
     "body-parser": "^1.20.1",
     "cached": "^6.1.0",
