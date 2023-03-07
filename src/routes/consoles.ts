@@ -21,6 +21,7 @@ export default function () {
       }
     },
     
+    // TODO: Move PUT and DELETE to src/routes/consoles/{consoleName}.ts
     async PUT (request: Request, response: Response, next: NextFunction) {
       try {
         const console = await ConsoleController.putConsole(request.params.consoleName, request.body);

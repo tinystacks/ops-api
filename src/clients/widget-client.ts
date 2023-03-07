@@ -17,7 +17,7 @@ const WidgetClient = {
     }
     throw error;
   },
-  async getWidget (consoleName: string, widgetId: string): Promise<BaseWidget> {
+  async getWidget (consoleName: string, widgetId: string, overrides?: any): Promise<BaseWidget> {
     try {
       const console = await ConsoleClient.getConsole(consoleName);
       const widget = console.widgets[widgetId];

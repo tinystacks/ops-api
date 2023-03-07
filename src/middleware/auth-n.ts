@@ -5,7 +5,8 @@ import {
   Response,
   NextFunction
 } from 'express';
-import { APIGateway } from '@aws-sdk/client-api-gateway';
+import { APIGateway, APIGatewayClientConfig } from '@aws-sdk/client-api-gateway';
+import { fromIni } from '@aws-sdk/credential-providers';
 
 const fiveMinutes = 5 * 60;
 const cache = cached('apiKey', {
@@ -18,17 +19,31 @@ const cache = cached('apiKey', {
 });
 
 async function fetchApiKey () {
-  const apigClient = new APIGateway({});
-  const response = await apigClient.getApiKey({
-    apiKey: process.env.API_KEY_ID,
-    includeValue: true
-  });
-  return response.value;
+  try {
+    const config: APIGatewayClientConfig = {};
+    const regionOverride = process.env.AWS_REGION_OVERRIDE;
+    if (regionOverride) {
+      config.region = regionOverride;
+    }
+    const profile = process.env.AWS_PROFILE_OVERRIDE;
+    if (profile) {
+      config.credentials = fromIni({ profile });
+    }
+    const apigClient = new APIGateway(config);
+    const response = await apigClient.getApiKey({
+      apiKey: process.env.API_KEY_ID,
+      includeValue: true
+    });
+    return response.value;
+  } catch (error) {
+    console.error('Failed to fetch api key!', error);
+    return '';
+  }
 }
 
 async function validateApiKey (request: Request) {
   const authHeader = request.headers['Authorization'] || request.headers['authorization'];
-  console.debug('Headers: ', Object.keys(request.headers));
+  // console.debug('Headers: ', Object.keys(request.headers));
   if (!authHeader) {
     console.error('No Authorization header included in the request!');
     throw HttpError.Unauthorized();
