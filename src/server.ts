@@ -25,6 +25,10 @@ function shutdown (server: any) {
     }
     process.exit(0);
   });
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug('Running in dev mode; exiting immediately...');
+    process.exit();
+  }
 }
 
 async function startServer () {
