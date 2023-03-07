@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Start fresh
+npm run clean;
+
 # Setup local persistent store
 if [ ! -f "store/example.yml" ];
   then
@@ -7,8 +10,6 @@ if [ ! -f "store/example.yml" ];
     cp basicexample.yml store/example.yml;
 fi
 
-
 # Build and run API
-npm run clean;
 npm run build;
 CONFIG_PATH="./store/example.yml" NODE_ENV=dev node ./dist/server.js
