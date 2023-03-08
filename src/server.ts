@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import { initialize } from 'express-openapi';
 import yaml from 'yamljs';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import path, { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
@@ -25,6 +25,10 @@ function shutdown (server: any) {
     }
     process.exit(0);
   });
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug('Running in dev mode; exiting immediately...');
+    process.exit();
+  }
 }
 
 async function startServer () {
