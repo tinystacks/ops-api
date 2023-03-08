@@ -13,7 +13,7 @@ Console:
       widgets:
         - $ref: '#/Console/widgets/SmallMarkdown'
         - $ref: '#/Console/widgets/MdTabs'
-        - $ref: '#/Console/widgets/RegularMulti'
+        # - $ref: '#/Console/widgets/BasicMarkdown'
   widgets:
     MdTabs:
       type: Tabs
@@ -23,23 +23,11 @@ Console:
         - $ref: '#/Console/widgets/Logs'
         - $ref: '#/Console/widgets/BasicMarkdown'
         - $ref: '#/Console/widgets/VertPanel'
-        - $ref: '#/Console/widgets/PickedJson'
       tabNames:
         - 'Metrics'
         - 'Logs'
         - 'Tab1'
         - 'Tab2'
-        - 'Json filtered'
-    PickedJson:
-      type: JsonTree
-      displayName: Filtered Json
-      jsonObject:
-        something:
-          - 'a short'
-          - 'list of strings'
-      paths:
-        - pathDisplayName: short path
-          path: something[0]
     Logs:
       type: AwsCloudWatchLogs
       displayName: cwlogs widget
@@ -48,33 +36,30 @@ Console:
         - $ref: '#/Console/providers/AwsLocalProvider'
       logGroupName: synth-backend-build
       logStreamName: 639fbc37-3d4b-4143-b250-08c80cb8b7a5
-      timeRange:
-        startTime: 1676911216118
-        endTime: 1677256816118
+      startTime: 1676911216118
+      endTime: 1677256816118
     Metrics:
       type: AwsCloudWatchMetricGraph
       displayName: cwmetrics widget
-      dependencies:
-        - EcsWidget
       region: 'us-east-1'
       period: 1440
       providers:
         - $ref: '#/Console/providers/AwsLocalProvider'
       timeRange:
-        time: 12
-        unit: h
+        startTime: 1676911216118
+        endTime: 1677256816118
       metrics:
         - metricNamespace: ECS/ContainerInsights
           metricName: NetworkRxBytes
-          metricDisplayName: Network Bytes/Sec
-          dimensions: 
+          metricDisplayName: hi
+          dimensions:
             - key: ClusterName
               value: cdk-synth-cluster
             - key: ServiceName
               value: tinystacks-service
         - metricNamespace: ECS/ContainerInsights
           metricName: NetworkRxBytes
-          metricDisplayName: Max Network Bytes/Sec
+          metricDisplayName: Max Hi
           statistic: Maximum
           dimensions:
             - key: ClusterName
@@ -84,12 +69,6 @@ Console:
     VertPanel:
       type: ColumnPanel
       displayName: column
-      children:
-        - $ref: '#/Console/widgets/Md1'
-        - $ref: '#/Console/widgets/Md2'
-    RegularMulti:
-      type: ColumnPanel
-      displayName: multi-widget
       children:
         - $ref: '#/Console/widgets/Md1'
         - $ref: '#/Console/widgets/Md2'
@@ -175,10 +154,9 @@ Console:
 
         ```
   dependencies:
+    AwsCloudWatchLogs: '@tinystacks/ops-aws-core-plugins'
     Markdown: '@tinystacks/ops-core-widgets'
     Tabs: '@tinystacks/ops-core-widgets'
     ColumnPanel: '@tinystacks/ops-core-widgets'
-    AwsCloudWatchLogs:        '@tinystacks/ops-aws-core-plugins'
-    AwsCredentialsProvider:   '@tinystacks/ops-aws-core-plugins'
+    AwsCredentialsProvider: '@tinystacks/ops-aws-core-plugins'
     AwsCloudWatchMetricGraph: '@tinystacks/ops-aws-core-plugins'
-    JsonTree:                 '@tinystacks/ops-aws-core-plugins'

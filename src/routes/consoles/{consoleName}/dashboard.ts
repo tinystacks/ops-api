@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import PageController from '../../../controllers/page-controller.js';
+import DashboardController from '../../../controllers/dashboard-controller.js';
 
 export default function () {
   return {
     async GET (request: Request, response: Response, next: NextFunction) {
       try {
-        const pages = await PageController.getPages(request.params.consoleName);
-        response.status(200).send(pages);
+        const dashboards = await DashboardController.getDashboards(request.params.consoleName);
+        response.status(200).send(dashboards);
       } catch (error) {
         next(error);
       }
@@ -14,8 +14,8 @@ export default function () {
     
     async POST (request: Request, response: Response, next: NextFunction) {
       try {
-        const page = await PageController.postPage(request.params.consoleName, request.body);
-        response.status(200).send(page);
+        const dashboard = await DashboardController.postDashboard(request.params.consoleName, request.body);
+        response.status(200).send(dashboard);
       } catch (error) {
         next(error);
       }

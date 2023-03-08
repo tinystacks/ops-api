@@ -25,7 +25,7 @@ describe('console controller tests', () => {
   it('postConsole', async () => {
     const requestBody: Console = {
       name: 'mock-console',
-      pages: {},
+      dashboards: {},
       providers: {},
       widgets: {}
     };
@@ -36,7 +36,7 @@ describe('console controller tests', () => {
   it('putConsole', async () => {
     const requestBody: Console = {
       name: 'mock-console',
-      pages: {},
+      dashboards: {},
       providers: {},
       widgets: {}
     };
