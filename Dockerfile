@@ -9,6 +9,10 @@ ARG CONFIG_PATH
 ENV CONFIG_PATH=${CONFIG_PATH}
 ENV PORT=8000
 
+WORKDIR /config
+
+COPY ./basicexample.yml .
+
 WORKDIR /app
 
 COPY . .
