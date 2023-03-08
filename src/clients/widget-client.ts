@@ -22,7 +22,7 @@ const WidgetClient = {
       const console = await ConsoleClient.getConsole(consoleName);
       const widget = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      return await this.hydrateWidgetReferences(widget, console.widgets, console.providers);
+      return await this.hydrateWidgetReferences(widget, console.widgets, console.providers, overrides);
     } catch (error) {
       return this.handleError(error);
     }
@@ -75,7 +75,7 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
-  async hydrateWidgetReferences (widget: any, consoleWidgets: Record<string, BaseWidget>, consoleProviders: Record<string, BaseProvider>) {
+  async hydrateWidgetReferences (widget: any, consoleWidgets: Record<string, BaseWidget>, consoleProviders: Record<string, BaseProvider>,  overrides?: any) {
 
     const referencedWidgets: Record<string, Widget> = {};
     for (const property in widget) {
@@ -100,7 +100,7 @@ const WidgetClient = {
     const hydratedProviders = (widget.providerIds || []).map((providerId: string) => {
       return consoleProviders[providerId];
     });
-    await widget.getData(hydratedProviders);
+    await widget.getData(hydratedProviders,  overrides);
     return widget;
   }
 };
