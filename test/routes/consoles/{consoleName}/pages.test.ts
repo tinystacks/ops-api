@@ -1,17 +1,17 @@
 const mockNext = jest.fn();
 const mockStatus = jest.fn();
 const mockSend = jest.fn();
-const mockGetPages = jest.fn();
-const mockPostPage = jest.fn();
+const mockGetDashboards = jest.fn();
+const mockPostDashboard = jest.fn();
 
-jest.mock('../../../../src/controllers/page-controller', () => ({
-  getPages: mockGetPages,
-  postPage: mockPostPage
+jest.mock('../../../../src/controllers/dashboard-controller', () => ({
+  getDashboards: mockGetDashboards,
+  postDashboard: mockPostDashboard
 }));
 
 jest.mock('express');
 
-import PageRoutes from '../../../../src/routes/consoles/{consoleName}/pages';
+import DashboardRoutes from '../../../../src/routes/consoles/{consoleName}/dashboards';
 import { Request, Response } from 'express';
 
 let mockRequest = {} as Request;
@@ -26,7 +26,7 @@ const mockResponse = {
   send: mockSend
 } as unknown as Response;
 
-describe('/pages tests', () => {
+describe('/dashboards tests', () => {
   beforeEach(() => {
     mockRequest = {} as Request;
     mockStatus.mockReturnValue(mockResponse);
@@ -41,12 +41,12 @@ describe('/pages tests', () => {
   describe('GET', () => {
     it('returns 200 if successful', async () => {
       mockRequest.params = mockRequestParams;
-      mockGetPages.mockResolvedValue([mockRequestBody]);
+      mockGetDashboards.mockResolvedValue([mockRequestBody]);
 
-      await PageRoutes().GET(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().GET(mockRequest, mockResponse, mockNext);
 
-      expect(mockGetPages).toBeCalled();
-      expect(mockGetPages).toBeCalledWith(mockRequestParams.consoleName);
+      expect(mockGetDashboards).toBeCalled();
+      expect(mockGetDashboards).toBeCalledWith(mockRequestParams.consoleName);
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(200);
       expect(mockSend).toBeCalled();
@@ -55,12 +55,12 @@ describe('/pages tests', () => {
     it('calls next function with error if an error is thrown', async () => {
       mockRequest.params = mockRequestParams;
       const mockError = new Error('Error!');
-      mockGetPages.mockImplementationOnce(() => { throw mockError; });
+      mockGetDashboards.mockImplementationOnce(() => { throw mockError; });
 
-      await PageRoutes().GET(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().GET(mockRequest, mockResponse, mockNext);
 
-      expect(mockGetPages).toBeCalled();
-      expect(mockGetPages).toBeCalledWith(mockRequestParams.consoleName);
+      expect(mockGetDashboards).toBeCalled();
+      expect(mockGetDashboards).toBeCalledWith(mockRequestParams.consoleName);
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();
@@ -71,12 +71,12 @@ describe('/pages tests', () => {
     it('returns 200 if successful', async () => {
       mockRequest.body = mockRequestBody;
       mockRequest.params = mockRequestParams;
-      mockPostPage.mockResolvedValue(mockRequestBody);
+      mockPostDashboard.mockResolvedValue(mockRequestBody);
 
-      await PageRoutes().POST(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().POST(mockRequest, mockResponse, mockNext);
 
-      expect(mockPostPage).toBeCalled();
-      expect(mockPostPage).toBeCalledWith(mockRequestParams.consoleName, mockRequestBody);
+      expect(mockPostDashboard).toBeCalled();
+      expect(mockPostDashboard).toBeCalledWith(mockRequestParams.consoleName, mockRequestBody);
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(200);
       expect(mockSend).toBeCalled();
@@ -86,12 +86,12 @@ describe('/pages tests', () => {
       mockRequest.body = mockRequestBody;
       mockRequest.params = mockRequestParams;
       const mockError = new Error('Error!');
-      mockPostPage.mockImplementationOnce(() => { throw mockError; });
+      mockPostDashboard.mockImplementationOnce(() => { throw mockError; });
 
-      await PageRoutes().POST(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().POST(mockRequest, mockResponse, mockNext);
 
-      expect(mockPostPage).toBeCalled();
-      expect(mockPostPage).toBeCalledWith(mockRequestParams.consoleName, mockRequestBody);
+      expect(mockPostDashboard).toBeCalled();
+      expect(mockPostDashboard).toBeCalledWith(mockRequestParams.consoleName, mockRequestBody);
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();

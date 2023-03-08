@@ -1,54 +1,54 @@
-const mockGetPages = jest.fn();
-const mockCreatePage = jest.fn();
-const mockUpdatePage = jest.fn();
-const mockDeletePage = jest.fn();
+const mockGetDashboards = jest.fn();
+const mockCreateDashboard = jest.fn();
+const mockUpdateDashboard = jest.fn();
+const mockDeleteDashboard = jest.fn();
 
-jest.mock('../../src/clients/page-client.ts', () => ({
-  getPages: mockGetPages,
-  createPage: mockCreatePage,
-  updatePage: mockUpdatePage,
-  deletePage: mockDeletePage
+jest.mock('../../src/clients/dashboard-client.ts', () => ({
+  getDashboards: mockGetDashboards,
+  createDashboard: mockCreateDashboard,
+  updateDashboard: mockUpdateDashboard,
+  deleteDashboard: mockDeleteDashboard
 }));
 
-import { Page } from '@tinystacks/ops-model';
-import PageController from '../../src/controllers/page-controller';
+import { Dashboard } from '@tinystacks/ops-model';
+import DashboardController from '../../src/controllers/dashboard-controller';
 
-describe('page controller tests', () => {
+describe('dashboard controller tests', () => {
   afterEach(() => {
     // for mocks
     jest.resetAllMocks();
     // for spies
     jest.restoreAllMocks();
   });
-  it('getPage', async () => {
-    await PageController.getPages('mock-console');
-    expect(mockGetPages).toBeCalled();
-    expect(mockGetPages).toBeCalledWith('mock-console');
+  it('getDashboard', async () => {
+    await DashboardController.getDashboards('mock-console');
+    expect(mockGetDashboards).toBeCalled();
+    expect(mockGetDashboards).toBeCalledWith('mock-console');
   });
-  it('postPage', async () => {
-    const requestBody: Page = {
-      route: '/mock-page',
+  it('postDashboard', async () => {
+    const requestBody: Dashboard = {
+      route: '/mock-dashboard',
       widgetIds: []
     };
-    await PageController.postPage('mock-console', requestBody);
-    expect(mockCreatePage).toBeCalled();
-    expect(mockCreatePage).toBeCalledWith('mock-console', requestBody);
+    await DashboardController.postDashboard('mock-console', requestBody);
+    expect(mockCreateDashboard).toBeCalled();
+    expect(mockCreateDashboard).toBeCalledWith('mock-console', requestBody);
   });
-  it('putPage', async () => {
-    const requestBody: Page = {
-      route: '/mock-page',
+  it('putDashboard', async () => {
+    const requestBody: Dashboard = {
+      route: '/mock-dashboard',
       widgetIds: []
     };
-    await PageController.putPage('mock-console', '/mock-page-2', requestBody);
-    expect(mockUpdatePage).toBeCalled();
-    expect(mockUpdatePage).toBeCalledWith('mock-console', '/mock-page-2', {
+    await DashboardController.putDashboard('mock-console', '/mock-dashboard-2', requestBody);
+    expect(mockUpdateDashboard).toBeCalled();
+    expect(mockUpdateDashboard).toBeCalledWith('mock-console', '/mock-dashboard-2', {
       ...requestBody,
-      route: '/mock-page-2'
+      route: '/mock-dashboard-2'
     });
   });
-  it('deletePage', async () => {
-    await PageController.deletePage('mock-console', '/mock-page');
-    expect(mockDeletePage).toBeCalled();
-    expect(mockDeletePage).toBeCalledWith('mock-console', '/mock-page');
+  it('deleteDashboard', async () => {
+    await DashboardController.deleteDashboard('mock-console', '/mock-dashboard');
+    expect(mockDeleteDashboard).toBeCalled();
+    expect(mockDeleteDashboard).toBeCalledWith('mock-console', '/mock-dashboard');
   });
 });

@@ -80,7 +80,7 @@ describe('local console client tests', () => {
       const mockConfigPath = './mock.yml';
       const mockConsole: ConsoleType = {
         name: 'mock-console',
-        pages: {},
+        dashboards: {},
         providers: {},
         widgets: {}
       };
@@ -128,7 +128,7 @@ describe('local console client tests', () => {
     it('throws InternalServerError if CONFIG_PATH is not set', async () => {
       const mockConsole = Console.fromJson({
         name: 'mock-console',
-        pages: {},
+        dashboards: {},
         providers: {},
         widgets: {}
       });
@@ -148,7 +148,7 @@ describe('local console client tests', () => {
       const mockConfigPath = './mock.yml';
       const mockConsole = Console.fromJson({
         name: 'mock-console',
-        pages: {},
+        dashboards: {},
         providers: {},
         widgets: {}
       });
@@ -173,7 +173,7 @@ describe('local console client tests', () => {
       const mockConfigPath = './mock.yml';
       const mockConsole = Console.fromJson({
         name: 'mock-console',
-        pages: {},
+        dashboards: {},
         providers: {},
         widgets: {}
       });
@@ -217,7 +217,7 @@ describe('local console client tests', () => {
       const mockConfigPath = './mock.yml';
       const mockConsole = Console.fromJson({
         name: 'mock-console',
-        pages: {},
+        dashboards: {},
         providers: {},
         widgets: {}
       });
@@ -238,7 +238,7 @@ describe('local console client tests', () => {
       const mockConfigPath = './mock.yml';
       const mockConsole = Console.fromJson({
         name: 'mock-console',
-        pages: {},
+        dashboards: {},
         providers: {},
         widgets: {}
       });
