@@ -1,5 +1,5 @@
 {
-  "name": "@tinystacks/ops-api",
+  "name": "ops-api",
   "version": "0.0.0",
   "main": "dist/server.js",
   "type": "module",
