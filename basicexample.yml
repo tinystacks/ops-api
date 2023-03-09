@@ -19,12 +19,14 @@ Console:
       type: Tabs
       displayName: Markdown Tabs
       children:
+        - $ref: '#/Console/widgets/AwsPanel'
         - $ref: '#/Console/widgets/Metrics'
         - $ref: '#/Console/widgets/Logs'
         - $ref: '#/Console/widgets/BasicMarkdown'
         - $ref: '#/Console/widgets/VertPanel'
         - $ref: '#/Console/widgets/PickedJson'
       tabNames:
+        - 'AWS Stuff'
         - 'Metrics'
         - 'Logs'
         - 'Tab1'
@@ -113,6 +115,20 @@ Console:
       displayName: A smaller markdown window
       markdown: >
         ### Not a lotta markdown 2
+    CliWidget:
+      type: AwsCli
+      displayName: Cli Widget
+      providers:
+        - $ref: '#/Console/providers/AwsLocalProvider'
+      command: >
+        echo hi;
+        echo bye;
+      runOnStart: false
+    AwsPanel:
+      type: Panel
+      displayName: Aws Panel
+      children:
+        - $ref: '#/Console/widgets/CliWidget'
     BasicMarkdown:
       type: Markdown
       displayName: Some Basic Markdown
@@ -121,60 +137,6 @@ Console:
 
         1. [Introduction](https://github.com/tinystacks/precloud/blob/main/README.md#introduction)
             1. [Use cases](https://github.com/tinystacks/precloud/blob/main/README.md#use-cases)
-        1. [How it works](https://github.com/tinystacks/precloud/blob/main/README.md#how-it-works)
-        1. [Contributing](https://github.com/tinystacks/precloud/blob/main/README.md#contributing)
-        1. [Installation](https://github.com/tinystacks/precloud/blob/main/README.md#installation)
-            1. [Install from the Global NPM registry](https://github.com/tinystacks/precloud/blob/main/README.md#install-from-the-global-npm-registry)
-                1. [Try it out](https://github.com/tinystacks/precloud/blob/main/README.md#try-it-out)
-            1. [Local Installation](https://github.com/tinystacks/precloud/blob/main/README.md#local-installation)
-        1. [Usage](https://github.com/tinystacks/precloud/blob/main/README.md#usage)
-            1. [precloud](https://github.com/tinystacks/precloud/blob/main/README.md#precloud)
-            1. [precloud --version](https://github.com/tinystacks/precloud/blob/main/README.md#precloud---version)
-            1. [precloud --help](https://github.com/tinystacks/precloud/blob/main/README.md#precloud---help)
-        1. [Available Commands](https://github.com/tinystacks/precloud/blob/main/README.md#Available-Commands)
-            1. [precloud help](https://github.com/tinystacks/precloud/blob/main/README.md#precloud-help)
-            1. [precloud check](https://github.com/tinystacks/precloud/blob/main/README.md#precloud-check)
-                1. [Options](https://github.com/tinystacks/precloud/blob/main/README.md#Options)
-                1. [Config File](https://github.com/tinystacks/precloud/blob/main/README.md#Config-File)
-                1. [Example Config File](https://github.com/tinystacks/precloud/blob/main/README.md#Example-Config-File)
-                1. [Check Behaviour](https://github.com/tinystacks/precloud/blob/main/README.md#Check-Behaviour)
-                1. [Authentication](https://github.com/tinystacks/precloud/blob/main/README.md#Authentication)
-                    1. [AWS](https://github.com/tinystacks/precloud/blob/main/README.md#AWS)
-                    1. [GCP](https://github.com/tinystacks/precloud/blob/main/README.md#GCP)
-                    1. [Microsoft Azure](https://github.com/tinystacks/precloud/blob/main/README.md#Microsoft-Azure)
-        1. [Community](https://github.com/tinystacks/precloud/blob/main/README.md#community)
-
-        ## Introduction
-        
-        <img src="https://github.com/tinystacks/precloud/blob/main/example.gif"
-            alt="example-gif"
-            style="float: left; margin-right: 10px;" />
-
-        Infrastructure code deployments often fail due to mismatched constraints over resource fields between the infrastructure code, the deployment engine, and the target cloud. For example, you may be able to pass any arbitrary string as a resource name to terraform or AWS CDK, and `plan` or `synth` go through fine, but the deployment may fail because that string failed a naming constraint on the target cloud.
-
-        This package is an open source command line interface that is run before deploying to the cloud. It contains rules that check for names, quotas, and resource-specific constraints to make sure that your infrastructure code can be deployed successfully.
-
-        #### Example Config File
-
-        ```json
-
-        {
-            "awsCdkParsers": [
-                "@tinystacks/aws-cdk-parser"
-            ],
-            "terraformParsers": [
-                "@tinystacks/terraform-resource-parser",
-                "@tinystacks/terraform-module-parser"
-            ],
-            "templateChecks": [
-                "@tinystacks/aws-template-checks"  
-            ],
-            "resourceChecks": [
-                "@tinystacks/aws-resource-checks"
-            ]
-        }
-
-        ```
   dependencies:
     Markdown: '@tinystacks/ops-core-widgets'
     Tabs: '@tinystacks/ops-core-widgets'
@@ -183,3 +145,4 @@ Console:
     AwsCredentialsProvider:   '@tinystacks/ops-aws-core-plugins'
     AwsCloudWatchMetricGraph: '@tinystacks/ops-aws-core-plugins'
     JsonTree:                 '@tinystacks/ops-aws-core-plugins'
+    AwsCli:                   '@tinystacks/ops-aws-core-plugins'
