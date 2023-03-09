@@ -82,14 +82,15 @@ Console:
             - key: ServiceName
               value: tinystacks-service
     VertPanel:
-      type: ColumnPanel
+      type: Panel
       displayName: column
       children:
         - $ref: '#/Console/widgets/Md1'
         - $ref: '#/Console/widgets/Md2'
     RegularMulti:
-      type: ColumnPanel
+      type: Panel
       displayName: multi-widget
+      orientation: horizontal
       children:
         - $ref: '#/Console/widgets/Md1'
         - $ref: '#/Console/widgets/Md2'
@@ -177,7 +178,7 @@ Console:
   dependencies:
     Markdown: '@tinystacks/ops-core-widgets'
     Tabs: '@tinystacks/ops-core-widgets'
-    ColumnPanel: '@tinystacks/ops-core-widgets'
+    Panel: '@tinystacks/ops-core-widgets'
     AwsCloudWatchLogs:        '@tinystacks/ops-aws-core-plugins'
     AwsCredentialsProvider:   '@tinystacks/ops-aws-core-plugins'
     AwsCloudWatchMetricGraph: '@tinystacks/ops-aws-core-plugins'
