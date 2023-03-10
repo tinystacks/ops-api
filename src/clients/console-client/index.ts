@@ -1,29 +1,31 @@
 import { ConsoleParser } from '@tinystacks/ops-core';
 import LocalConsoleClient from './local.js';
+import IConsoleClient from './i-console-client.js';
+import S3ConsoleClient from './s3.js';
 
 /**
  * TODO: Eventually this becomes a proxy class which based on the environment returns a specific client i.e. local vs github vs s3 etc.
  */
-const ConsoleClient = {
-  async getConsole (_consoleName: string): Promise<ConsoleParser> {
-    // TODO: Add switching based on context for sourcing from other places.
-    return LocalConsoleClient.getLocalConsole();
-  },
-  async getConsoles (): Promise<ConsoleParser[]> {
-    // TODO: Add switching based on context for sourcing from other places.
-    const consoles = [];
-    const localConsole = await LocalConsoleClient.getLocalConsole();
-    if (localConsole) consoles.push(localConsole);
-    return consoles;
-  },
-  async saveConsole (_consoleName: string, console: ConsoleParser): Promise<ConsoleParser> {
-    // TODO: Add switching based on context for sourcing from other places.
-    return LocalConsoleClient.saveLocalConsole(console);
-  },
-  async deleteConsole (consoleName: string): Promise<ConsoleParser> {
-    // TODO: Add switching based on context for sourcing from other places.
-    return LocalConsoleClient.deleteLocalConsole(consoleName);
+class ConsoleClient implements IConsoleClient {
+  getConsoles: () => Promise<ConsoleParser[]>;
+  getConsole: (consoleName: string) => Promise<ConsoleParser>;
+  saveConsole: (consoleName: string, console: ConsoleParser) => Promise<ConsoleParser>;
+  deleteConsole: (_onsoleName: string) => Promise<ConsoleParser>;
+
+  constructor () {
+    const configPath = process.env.CONFIG_PATH;
+    let client: IConsoleClient;
+    if (configPath.startsWith('s3://')) {
+      client = new S3ConsoleClient();
+    } else {
+      client = new LocalConsoleClient();
+    }
+
+    this.getConsole = client.getConsole.bind(client);
+    this.getConsoles = client.getConsoles.bind(client);
+    this.saveConsole = client.saveConsole.bind(client);
+    this.deleteConsole = client.deleteConsole.bind(client);
   }
-};
+}
 
 export default ConsoleClient;

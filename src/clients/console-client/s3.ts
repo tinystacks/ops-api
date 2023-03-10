@@ -12,7 +12,7 @@ import {
 import FsUtils from '../../utils/fs-utils.js';
 import IConsoleClient from './i-console-client.js';
 
-class LocalConsoleClient implements IConsoleClient {
+class S3ConsoleClient implements IConsoleClient {
   async getConsole (_consoleName?: string): Promise<ConsoleParser> {
     const configPath = process.env.CONFIG_PATH;
     if (configPath) {
@@ -20,7 +20,7 @@ class LocalConsoleClient implements IConsoleClient {
       // console.debug('configFilePath: ', configFilePath);
       const configFile = FsUtils.tryToReadFile(configFilePath);
       if (!configFile) throw HttpError.NotFound(`Cannot fetch consoles! Config file ${configPath} not found!`);
-      const configJson = (yaml.load(configFile.toString()) as any)?.Console as YamlConsole;
+      const configJson = (yaml.load(configFile.toString()) as any).Console as YamlConsole;
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
         const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
@@ -66,4 +66,4 @@ class LocalConsoleClient implements IConsoleClient {
   }
 }
 
-export default LocalConsoleClient;
+export default S3ConsoleClient;

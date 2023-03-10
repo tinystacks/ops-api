@@ -17,7 +17,8 @@ const DashboardClient = {
   },
   async getDashboard (consoleName: string, dashboardId: string): Promise<DashboardParser> { //should return a dashboardParser
     try {
-      const console : ConsoleParser = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console : ConsoleParser = await consoleClient.getConsole(consoleName);
       const existingDashboard = console.dashboards[dashboardId];
       if (!existingDashboard) throw HttpError.NotFound(`Dashboard with id ${dashboardId} does not exist in console ${consoleName}!`);
       return existingDashboard;
@@ -27,7 +28,8 @@ const DashboardClient = {
   },
   async getDashboards (consoleName: string): Promise<DashboardParser[]> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       return Object.values(console.dashboards);
     } catch (error) {
       return this.handleError(error);
@@ -35,7 +37,8 @@ const DashboardClient = {
   },
   async createDashboard (consoleName: string, dashboard: Dashboard): Promise<DashboardParser> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const routeId = upperFirst(camelCase(dashboard.route));
       const dashboardId = dashboard.id || routeId;
       dashboard.id = dashboardId;
@@ -44,7 +47,7 @@ const DashboardClient = {
       if (existingDashboard) throw HttpError.Conflict(`Cannot create new dashboard with id ${dashboardId} because a dashboard with this id already exists on console ${consoleName}!`);
       if (existingDashboardWithRoute) throw HttpError.Conflict(`Cannot create new dashboard with route ${dashboard.route} because a dashboard with this route already exists on console ${consoleName}!`);
       console.addDashboard(dashboard, dashboardId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return this.getDashboard(consoleName, dashboard.id);
     } catch (error) {
       return this.handleError(error);
@@ -52,13 +55,14 @@ const DashboardClient = {
   },
   async updateDashboard (consoleName: string, dashboardId: string, dashboard: Dashboard): Promise<DashboardParser> {
     try {
-      const console: ConsoleParser = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console: ConsoleParser = await consoleClient.getConsole(consoleName);
       const existingDashboard = console.dashboards[dashboardId];
       if (isNil(existingDashboard)) throw HttpError.NotFound(`Cannot update dashboard with id ${dashboardId} because this dashboard does not exist on console ${consoleName}!`);
       // No trickery allowed.
       dashboard.id = dashboardId;
       console.updateDashboard(dashboard, dashboardId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return this.getDashboard(consoleName, dashboard.id);
     } catch (error) {
       return this.handleError(error);
@@ -66,11 +70,12 @@ const DashboardClient = {
   },
   async deleteDashboard (consoleName: string, dashboardId: string): Promise<DashboardParser> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const existingDashboard = console.dashboards[dashboardId];
       if (isNil(existingDashboard)) throw HttpError.NotFound(`Cannot delete dashboard with id ${dashboardId} because this dashboard does not exist on console ${consoleName}!`);
       console.deleteDashboard(dashboardId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return existingDashboard;
     } catch (error) {
       return this.handleError(error);
