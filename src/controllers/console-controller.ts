@@ -20,7 +20,7 @@ const ConsoleController = {
   async putConsole (consoleName: string, updateConsoleBody: ConsoleType): Promise<ConsoleType> {
     const console: ConsoleParser = await ConsoleParser.fromJson(updateConsoleBody);
     const consoleClient = new ConsoleClient();
-    const updatedConsole = await consoleClient.saveConsole(console.name, console);
+    const updatedConsole = await consoleClient.saveConsole(consoleName, console);
     return updatedConsole.toJson();
   },
   async deleteConsole (consoleName: string): Promise<ConsoleType> {

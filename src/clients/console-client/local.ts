@@ -19,16 +19,16 @@ class LocalConsoleClient implements IConsoleClient {
       const configFilePath = resolvePath(configPath);
       // console.debug('configFilePath: ', configFilePath);
       const configFile = FsUtils.tryToReadFile(configFilePath);
-      if (!configFile) throw HttpError.NotFound(`Cannot fetch consoles! Config file ${configPath} not found!`);
+      if (!configFile) throw HttpError.NotFound(`Cannot fetch console! Config file ${configPath} not found!`);
       const configJson = (yaml.load(configFile.toString()) as any)?.Console as YamlConsole;
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
         const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
         return ConsoleParser.fromJson(consoleType);
       }
-      throw HttpError.InternalServerError('Cannot fetch consoles! The contents of the config file was empty or invalid!');
+      throw HttpError.InternalServerError('Cannot fetch console! The contents of the config file was empty or invalid!');
     }
-    throw HttpError.InternalServerError('Cannot fetch consoles! No value was found for CONFIG_PATH!');
+    throw HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!');
   }
   async getConsoles (): Promise<ConsoleParser[]> {
     const consoles = [];

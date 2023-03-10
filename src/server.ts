@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import { initialize } from 'express-openapi';
 import yaml from 'yamljs';
-import { readFileSync } from 'fs';
+import { readFileSync, rmSync } from 'fs';
 import path, { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
 import swaggerUi from 'swagger-ui-express';
@@ -12,10 +12,15 @@ import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import { unless } from './middleware/filters.js';
 import { authenticationMiddleware } from './middleware/auth-n.js';
+import { TMP_DIR } from './constants.js';
 
 const require = createRequire(import.meta.url);
 
 const { json } = BodyParser;
+
+function cleanTmpDirectory () {
+  rmSync(TMP_DIR, { recursive: true, force: true });
+}
 
 function shutdown (server: any) {
   server.close((error: Error) => {
@@ -23,6 +28,7 @@ function shutdown (server: any) {
       console.error(error);
       process.exit(1);
     }
+    cleanTmpDirectory();
     process.exit(0);
   });
   if (process.env.NODE_ENV !== 'production') {
