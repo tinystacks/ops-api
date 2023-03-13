@@ -18,7 +18,8 @@ const WidgetClient = {
   },
   async getWidget (consoleName: string, widgetId: string, overrides?: any): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
       const hydratedProviders = (widget.providerIds || []).map((providerId) => {
@@ -32,7 +33,8 @@ const WidgetClient = {
   },
   async createWidget (consoleName: string, widget: Widget): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const widgetId = widget.id || upperFirst(camelCase(widget.displayName));
       widget.id = widgetId;
       const existingWidget = console.widgets[widgetId];
@@ -42,7 +44,7 @@ const WidgetClient = {
       const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
       const newWidget = widgetInstance.toJson();
       await console.addWidget(newWidget, widgetId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(consoleName, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
       return this.handleError(error);
@@ -50,7 +52,8 @@ const WidgetClient = {
   },
   async updateWidget (consoleName: string, widgetId: string, widget: Widget): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const existingWidget = console.widgets[widgetId];
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot update widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       // No trickery allowed.
@@ -60,7 +63,7 @@ const WidgetClient = {
       const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
       const updatedWidget = widgetInstance.toJson();
       await console.updateWidget(updatedWidget, widgetId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
       return this.handleError(error);
@@ -68,11 +71,12 @@ const WidgetClient = {
   },
   async deleteWidget (consoleName: string, widgetId: string): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const existingWidget = console.widgets[widgetId];
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot delete widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       console.deleteWidget(widgetId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return existingWidget;
     } catch (error) {
       return this.handleError(error);
