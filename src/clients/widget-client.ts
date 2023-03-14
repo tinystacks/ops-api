@@ -3,8 +3,9 @@ import HttpError from 'http-errors';
 import ConsoleClient from './console-client/index.js';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
+import get from 'lodash.get';
 import { Widget } from '@tinystacks/ops-model';
-import { BaseWidget } from '@tinystacks/ops-core';
+import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -22,11 +23,7 @@ const WidgetClient = {
       const console = await consoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      const hydratedProviders = (widget.providerIds || []).map((providerId) => {
-        return console.providers[providerId];
-      });
-      await widget.getData(hydratedProviders, overrides);
-      return widget;
+      return await this.hydrateWidgetReferences(widget, console.widgets, console.providers, overrides);
     } catch (error) {
       return this.handleError(error);
     }
@@ -81,6 +78,35 @@ const WidgetClient = {
     } catch (error) {
       return this.handleError(error);
     }
+  },
+  async hydrateWidgetReferences (widget: any, consoleWidgets: Record<string, BaseWidget>, consoleProviders: Record<string, BaseProvider>,  overrides?: any) {
+
+    const referencedWidgets: Record<string, Widget> = {};
+    for (const property in widget) {
+      if (typeof widget[property] === 'object' && '$ref' in widget[property]) {
+        const [_, __, ___, widgetId] = widget[property].$ref.split('/');
+        const refWidget = consoleWidgets[widgetId];
+        let fullRefWidget;
+        if (referencedWidgets[refWidget.id]) {
+          fullRefWidget = referencedWidgets[refWidget.id];
+        } else {
+          fullRefWidget = await this.hydrateWidgetReferences(refWidget, consoleWidgets, consoleProviders);
+          referencedWidgets[fullRefWidget.id] = fullRefWidget;
+        }
+        if ('path' in widget[property]) {
+          const value = get(fullRefWidget, widget[property].path);
+          widget[property] = value;
+        } else {
+          widget[property] = fullRefWidget;
+        }
+      }
+    }
+    const hydratedProviders = (widget.providerIds || []).map((providerId: string) => {
+      return consoleProviders[providerId];
+    });
+    await widget.getData(hydratedProviders,  overrides);
+    return widget;
   }
 };
+
 export default WidgetClient;
