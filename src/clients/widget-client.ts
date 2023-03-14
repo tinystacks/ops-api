@@ -3,8 +3,9 @@ import HttpError from 'http-errors';
 import ConsoleClient from './console-client/index.js';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
+import get from 'lodash.get';
 import { Widget } from '@tinystacks/ops-model';
-import { BaseWidget } from '@tinystacks/ops-core';
+import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -18,21 +19,19 @@ const WidgetClient = {
   },
   async getWidget (consoleName: string, widgetId: string, overrides?: any): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      const hydratedProviders = (widget.providerIds || []).map((providerId) => {
-        return console.providers[providerId];
-      });
-      await widget.getData(hydratedProviders, overrides);
-      return widget;
+      return await this.hydrateWidgetReferences(widget, console.widgets, console.providers, overrides);
     } catch (error) {
       return this.handleError(error);
     }
   },
   async createWidget (consoleName: string, widget: Widget): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const widgetId = widget.id || upperFirst(camelCase(widget.displayName));
       widget.id = widgetId;
       const existingWidget = console.widgets[widgetId];
@@ -42,7 +41,7 @@ const WidgetClient = {
       const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
       const newWidget = widgetInstance.toJson();
       await console.addWidget(newWidget, widgetId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(consoleName, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
       return this.handleError(error);
@@ -50,7 +49,8 @@ const WidgetClient = {
   },
   async updateWidget (consoleName: string, widgetId: string, widget: Widget): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const existingWidget = console.widgets[widgetId];
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot update widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       // No trickery allowed.
@@ -60,7 +60,7 @@ const WidgetClient = {
       const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
       const updatedWidget = widgetInstance.toJson();
       await console.updateWidget(updatedWidget, widgetId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return this.getWidget(consoleName, widget.id);
     } catch (error) {
       return this.handleError(error);
@@ -68,15 +68,45 @@ const WidgetClient = {
   },
   async deleteWidget (consoleName: string, widgetId: string): Promise<BaseWidget> {
     try {
-      const console = await ConsoleClient.getConsole(consoleName);
+      const consoleClient = new ConsoleClient();
+      const console = await consoleClient.getConsole(consoleName);
       const existingWidget = console.widgets[widgetId];
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot delete widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       console.deleteWidget(widgetId);
-      await ConsoleClient.saveConsole(console.name, console);
+      await consoleClient.saveConsole(console.name, console);
       return existingWidget;
     } catch (error) {
       return this.handleError(error);
     }
+  },
+  async hydrateWidgetReferences (widget: any, consoleWidgets: Record<string, BaseWidget>, consoleProviders: Record<string, BaseProvider>,  overrides?: any) {
+
+    const referencedWidgets: Record<string, Widget> = {};
+    for (const property in widget) {
+      if (typeof widget[property] === 'object' && '$ref' in widget[property]) {
+        const [_, __, ___, widgetId] = widget[property].$ref.split('/');
+        const refWidget = consoleWidgets[widgetId];
+        let fullRefWidget;
+        if (referencedWidgets[refWidget.id]) {
+          fullRefWidget = referencedWidgets[refWidget.id];
+        } else {
+          fullRefWidget = await this.hydrateWidgetReferences(refWidget, consoleWidgets, consoleProviders);
+          referencedWidgets[fullRefWidget.id] = fullRefWidget;
+        }
+        if ('path' in widget[property]) {
+          const value = get(fullRefWidget, widget[property].path);
+          widget[property] = value;
+        } else {
+          widget[property] = fullRefWidget;
+        }
+      }
+    }
+    const hydratedProviders = (widget.providerIds || []).map((providerId: string) => {
+      return consoleProviders[providerId];
+    });
+    await widget.getData(hydratedProviders,  overrides);
+    return widget;
   }
 };
+
 export default WidgetClient;

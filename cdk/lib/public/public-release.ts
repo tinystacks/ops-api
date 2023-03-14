@@ -21,30 +21,36 @@ import {
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { name } from '../../../package.json';
-import { CfnPublicRepository } from 'aws-cdk-lib/aws-ecr';
+import { CfnPublicRepository, Repository } from 'aws-cdk-lib/aws-ecr';
+
+interface PublicReleaseProps {
+  privateEcrRepo: Repository
+}
 
 class PublicRelease extends Construct {
-  constructor (scope: Construct) {
+  constructor (scope: Construct, props: PublicReleaseProps) {
     super(scope, 'PublicRelease');
+
+    const { privateEcrRepo } = props;
 
     const publicEcrRepo = new CfnPublicRepository(this, constructId(name, 'publicEcrRepo'), {
       repositoryName: name,
       repositoryCatalogData: {
-        'description': 'Open source version of the ops-console-api.',
-        'architectures': [
+        'RepositoryDescription': 'Open source version of the ops-console-api.',
+        'Architectures': [
           'ARM 64',
           'x86-64'
         ],
-        'operatingSystems': [
+        'OperatingSystems': [
           'Linux'
         ],
-        'logoUrl': 'https://d3g9o9u8re44ak.cloudfront.net/logo/6b353252-f327-4419-8c9a-4be8eb8f7ad5/5c70ebc2-2eab-489b-9722-f83e7bc2deb1.png',
-        'aboutText': fs.readFileSync(path.resolve(__dirname, '../../ABOUT.md')),
-        'usageText': fs.readFileSync(path.resolve(__dirname, '../../USAGE.md'))
+        // 'LogoUrl': 'https://d3g9o9u8re44ak.cloudfront.net/logo/6b353252-f327-4419-8c9a-4be8eb8f7ad5/5c70ebc2-2eab-489b-9722-f83e7bc2deb1.png',
+        'AboutText': fs.readFileSync(path.resolve(__dirname, '../../ABOUT.md')).toString(),
+        'UsageText': fs.readFileSync(path.resolve(__dirname, '../../USAGE.md')).toString()
       }
     });
 
-    const projectName = `${name}-dev-build`;
+    const projectName = `${name}-public-release`;
 
     const logGroupName = generateName({
       identifiers: [projectName, 'logs'],
@@ -101,6 +107,17 @@ class PublicRelease extends Construct {
         'sts:GetCallerIdentity'
       ],
       resources: ['*']
+    }));
+    codebuildProject.addToRolePolicy(new PolicyStatement({
+      actions: [
+        'ecr:BatchCheckLayerAvailability',
+        'ecr:CompleteLayerUpload',
+        'ecr:InitiateLayerUpload',
+        'ecr:ListImages',
+        'ecr:PutImage',
+        'ecr:UploadLayerPart'
+      ],
+      resources: [privateEcrRepo.repositoryArn]
     }));
     codebuildProject.addToRolePolicy(new PolicyStatement({
       actions: [

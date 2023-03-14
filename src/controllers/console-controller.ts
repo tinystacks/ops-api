@@ -4,7 +4,8 @@ import { ConsoleParser } from '@tinystacks/ops-core';
 
 const ConsoleController = {
   async getConsoles (): Promise<ConsoleType[]> {
-    const consoles: ConsoleParser[] = await ConsoleClient.getConsoles();
+    const consoleClient = new ConsoleClient();
+    const consoles: ConsoleParser[] = await consoleClient.getConsoles();
     const consoleTypes: ConsoleType[] = consoles.map( (console) => { 
       return console.toJson();
     }); 
@@ -12,15 +13,20 @@ const ConsoleController = {
   },
   async postConsole (createConsoleBody: ConsoleType): Promise<ConsoleType> {
     const console: ConsoleParser = await ConsoleParser.fromJson(createConsoleBody);
-    return (await (ConsoleClient.saveConsole(console.name, console))).toJson();
+    const consoleClient = new ConsoleClient();
+    const newConsole = await consoleClient.saveConsole(console.name, console);
+    return newConsole.toJson();
   },
   async putConsole (consoleName: string, updateConsoleBody: ConsoleType): Promise<ConsoleType> {
     const console: ConsoleParser = await ConsoleParser.fromJson(updateConsoleBody);
-    console.name = consoleName;
-    return (await ConsoleClient.saveConsole(consoleName, console)).toJson();
+    const consoleClient = new ConsoleClient();
+    const updatedConsole = await consoleClient.saveConsole(consoleName, console);
+    return updatedConsole.toJson();
   },
   async deleteConsole (consoleName: string): Promise<ConsoleType> {
-    return (await ConsoleClient.deleteConsole(consoleName)).toJson();
+    const consoleClient = new ConsoleClient();
+    const deletedConsole = await consoleClient.deleteConsole(consoleName);
+    return deletedConsole.toJson();
   }
 };
 

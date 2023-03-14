@@ -11,45 +11,37 @@ Console:
       id: MainDashboard
       route: main
       widgets:
-        - $ref: '#/Console/widgets/SmallMarkdown'
-        - $ref: '#/Console/widgets/MdTabs'
-        - $ref: '#/Console/widgets/RegularMulti'
+        - $ref: '#/Console/widgets/EcsInfo'
+        - $ref: '#/Console/widgets/EcsMonitoringTabs'
+
   widgets:
-    MdTabs:
+    EcsInfo:
+      type: AwsEcsInfo
+      displayName: Synth Service
+      providers:
+        - $ref: '#/Console/providers/AwsLocalProvider'
+      region: us-east-1
+      clusterName: cdk-synth-cluster
+      serviceName: tinystacks-service
+
+    EcsMonitoringTabs:
       type: Tabs
-      displayName: Markdown Tabs
+      displayName: Monitoring
       children:
-        - $ref: '#/Console/widgets/AwsPanel'
         - $ref: '#/Console/widgets/Metrics'
         - $ref: '#/Console/widgets/Logs'
-        - $ref: '#/Console/widgets/BasicMarkdown'
-        - $ref: '#/Console/widgets/VertPanel'
-        - $ref: '#/Console/widgets/PickedJson'
       tabNames:
-        - 'AWS Stuff'
         - 'Metrics'
         - 'Logs'
-        - 'Tab1'
-        - 'Tab2'
-        - 'Json filtered'
-    PickedJson:
-      type: JsonTree
-      displayName: Filtered Json
-      jsonObject:
-        something:
-          - 'a short'
-          - 'list of strings'
-      paths:
-        - pathDisplayName: short path
-          path: something[0]
     Logs:
       type: AwsCloudWatchLogs
       displayName: cwlogs widget
       region: 'us-east-1'
       providers:
         - $ref: '#/Console/providers/AwsLocalProvider'
-      logGroupName: synth-backend-build
-      logStreamName: 639fbc37-3d4b-4143-b250-08c80cb8b7a5
+      logGroupName: 
+        $ref: '#/Console/widgets/EcsInfo'
+        path: images[0].cwLogsGroupArn
       timeRange:
         startTime: 1676911216118
         endTime: 1677256816118
@@ -83,60 +75,6 @@ Console:
               value: cdk-synth-cluster
             - key: ServiceName
               value: tinystacks-service
-    VertPanel:
-      type: Panel
-      displayName: column
-      children:
-        - $ref: '#/Console/widgets/Md1'
-        - $ref: '#/Console/widgets/Md2'
-    RegularMulti:
-      type: Panel
-      displayName: multi-widget
-      orientation: horizontal
-      children:
-        - $ref: '#/Console/widgets/Md1'
-        - $ref: '#/Console/widgets/Md2'
-    SmallMarkdown:
-      type: Markdown
-      displayName: A smaller markdown window
-      text: Well well well what we've got here is some downright straightforward markdown
-      markdown: >
-        ### Just a little link tree
-
-        1. [Introduction](https://github.com/tinystacks/precloud/blob/main/README.md#introduction)
-            1. [Use cases](https://github.com/tinystacks/precloud/blob/main/README.md#use-cases)
-    Md1:
-      type: Markdown
-      displayName: A smaller markdown window
-      markdown: >
-        ### Not a lotta markdown 1
-    Md2:
-      type: Markdown
-      displayName: A smaller markdown window
-      markdown: >
-        ### Not a lotta markdown 2
-    CliWidget:
-      type: AwsCli
-      displayName: Cli Widget
-      providers:
-        - $ref: '#/Console/providers/AwsLocalProvider'
-      command: >
-        echo hi;
-        echo bye;
-      runOnStart: false
-    AwsPanel:
-      type: Panel
-      displayName: Aws Panel
-      children:
-        - $ref: '#/Console/widgets/CliWidget'
-    BasicMarkdown:
-      type: Markdown
-      displayName: Some Basic Markdown
-      markdown: >
-        # precloud - Dynamic tests for infrastructure-as-code
-
-        1. [Introduction](https://github.com/tinystacks/precloud/blob/main/README.md#introduction)
-            1. [Use cases](https://github.com/tinystacks/precloud/blob/main/README.md#use-cases)
   dependencies:
     Markdown: '@tinystacks/ops-core-widgets'
     Tabs: '@tinystacks/ops-core-widgets'
@@ -144,5 +82,6 @@ Console:
     AwsCloudWatchLogs:        '@tinystacks/ops-aws-core-plugins'
     AwsCredentialsProvider:   '@tinystacks/ops-aws-core-plugins'
     AwsCloudWatchMetricGraph: '@tinystacks/ops-aws-core-plugins'
+    AwsEcsInfo:               '@tinystacks/ops-aws-core-plugins'
     JsonTree:                 '@tinystacks/ops-aws-core-plugins'
     AwsCli:                   '@tinystacks/ops-aws-core-plugins'

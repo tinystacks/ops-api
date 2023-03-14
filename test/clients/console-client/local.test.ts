@@ -54,7 +54,7 @@ describe('local console client tests', () => {
         expect(mockResolve).not.toBeCalled();
         expect(mockTryToReadFile).not.toBeCalled();
         expect(thrownError).toBeDefined();
-        expect(thrownError).toEqual(HttpError.InternalServerError('Cannot fetch consoles! No value was found for CONFIG_PATH!'));
+        expect(thrownError).toEqual(HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!'));
       }
     });
     it('throws NotFound if file returns undefined', async () => {
@@ -73,7 +73,7 @@ describe('local console client tests', () => {
         expect(mockTryToReadFile).toBeCalled();
         expect(mockTryToReadFile).toBeCalledWith(mockConfigPath);
         expect(thrownError).toBeDefined();
-        expect(thrownError).toEqual(HttpError.NotFound('Cannot fetch consoles! Config file ./mock.yml not found!'));
+        expect(thrownError).toEqual(HttpError.NotFound('Cannot fetch console! Config file ./mock.yml not found!'));
       }
     });
     it('returns Console on success', async () => {
@@ -120,7 +120,7 @@ describe('local console client tests', () => {
         expect(mockLoad).toBeCalled();
         expect(mockLoad).toBeCalledWith('Console: ');
         expect(thrownError).toBeDefined();
-        expect(thrownError).toEqual(HttpError.InternalServerError('Cannot fetch consoles! The contents of the config file was empty or invalid!'));
+        expect(thrownError).toEqual(HttpError.InternalServerError('Cannot fetch console! The contents of the config file was empty or invalid!'));
       }
     });
   });

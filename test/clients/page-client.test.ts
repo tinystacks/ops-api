@@ -21,7 +21,7 @@ describe('dashboard client tests', () => {
   describe('handleError', () => {
     describe('reuses console client errors when possible', () => {
       it('CONFIG_PATH', () => {
-        const error = HttpError.InternalServerError('Cannot fetch consoles! No value was found for CONFIG_PATH!');
+        const error = HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!');
         let thrownError;
         try {
           DashboardClient.handleError(error);
@@ -35,7 +35,7 @@ describe('dashboard client tests', () => {
         }
       });
       it('Config file', () => {
-        const error = HttpError.NotFound('Cannot fetch consoles! Config file test.yml not found!');
+        const error = HttpError.NotFound('Cannot fetch console! Config file test.yml not found!');
         let thrownError;
         try {
           DashboardClient.handleError(error);

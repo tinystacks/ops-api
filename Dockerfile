@@ -17,12 +17,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN mv ./.npmrc ./.npmrc.dev
-RUN mv ./.npmrc.prod ./.npmrc
 RUN npm run clean-build
 RUN rm -rf ./src
-# Uncomment once core-plugins repo exists and is installable
-# RUN npm prune --production
+RUN npm prune --production
 
 
 EXPOSE 8000
