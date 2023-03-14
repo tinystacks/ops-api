@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import isObject from 'lodash.isobject';
 import WidgetController from '../../../../controllers/widget-controller.js';
 
 export default function () {
@@ -7,7 +6,15 @@ export default function () {
     async GET (request: Request, response: Response, next: NextFunction) {
       try {
         const rawOverrides = request.query.overrides;
-        const overrides: any = rawOverrides && isObject(rawOverrides) ? rawOverrides : undefined;
+        let overrides: any = undefined;
+        if (rawOverrides && typeof rawOverrides === 'string') {
+          try {
+            overrides = JSON.parse(rawOverrides);
+          } catch (e) {
+            console.error('non-stringified overrides');
+            console.error(e);
+          }
+        } 
         const widget = await WidgetController.getWidget(request.params.consoleName, request.params.widgetId, overrides);
         response.status(200).send(widget);
       } catch (error) {

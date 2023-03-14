@@ -23,7 +23,7 @@ Console:
       region: us-east-1
       clusterName: cdk-synth-cluster
       serviceName: tinystacks-service
-      
+
     EcsMonitoringTabs:
       type: Tabs
       displayName: Monitoring
@@ -84,3 +84,4 @@ Console:
     AwsCloudWatchMetricGraph: '@tinystacks/ops-aws-core-plugins'
     AwsEcsInfo:               '@tinystacks/ops-aws-core-plugins'
     JsonTree:                 '@tinystacks/ops-aws-core-plugins'
+    AwsCli:                   '@tinystacks/ops-aws-core-plugins'
