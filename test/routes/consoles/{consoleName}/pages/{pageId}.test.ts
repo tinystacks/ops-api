@@ -1,33 +1,33 @@
 const mockNext = jest.fn();
 const mockStatus = jest.fn();
 const mockSend = jest.fn();
-const mockPutPage = jest.fn();
-const mockDeletePage = jest.fn();
+const mockPutDashboard = jest.fn();
+const mockDeleteDashboard = jest.fn();
 
-jest.mock('../../../../../src/controllers/page-controller.ts', () => ({
-  putPage: mockPutPage,
-  deletePage: mockDeletePage
+jest.mock('../../../../../src/controllers/dashboard-controller.ts', () => ({
+  putDashboard: mockPutDashboard,
+  deleteDashboard: mockDeleteDashboard
 }));
 
 jest.mock('express');
 
-import PageRoutes from '../../../../../src/routes/consoles/{consoleName}/pages/{pageId}';
+import DashboardRoutes from '../../../../../src/routes/consoles/{consoleName}/dashboards/{dashboardId}';
 import { Request, Response } from 'express';
 
 let mockRequest = {} as Request;
 const mockRequestBody = {
-  name: 'mock-page'
+  name: 'mock-dashboard'
 };
 const mockRequestParams = {
   consoleName: 'mock-console',
-  pageId: 'mock'
+  dashboardId: 'mock'
 };
 const mockResponse = {
   status: mockStatus,
   send: mockSend
 } as unknown as Response;
 
-describe('/pages/{pageId} tests', () => {
+describe('/dashboards/{dashboardId} tests', () => {
   beforeEach(() => {
     mockRequest = {} as Request;
     mockStatus.mockReturnValue(mockResponse);
@@ -43,12 +43,12 @@ describe('/pages/{pageId} tests', () => {
     it('returns 200 if successful', async () => {
       mockRequest.body = mockRequestBody;
       mockRequest.params = mockRequestParams;
-      mockPutPage.mockResolvedValue(mockRequestBody);
+      mockPutDashboard.mockResolvedValue(mockRequestBody);
 
-      await PageRoutes().PUT(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().PUT(mockRequest, mockResponse, mockNext);
 
-      expect(mockPutPage).toBeCalled();
-      expect(mockPutPage).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.pageId, mockRequestBody);
+      expect(mockPutDashboard).toBeCalled();
+      expect(mockPutDashboard).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.dashboardId, mockRequestBody);
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(200);
       expect(mockSend).toBeCalled();
@@ -58,12 +58,12 @@ describe('/pages/{pageId} tests', () => {
       mockRequest.body = mockRequestBody;
       mockRequest.params = mockRequestParams;
       const mockError = new Error('Error!');
-      mockPutPage.mockImplementationOnce(() => { throw mockError; });
+      mockPutDashboard.mockImplementationOnce(() => { throw mockError; });
 
-      await PageRoutes().PUT(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().PUT(mockRequest, mockResponse, mockNext);
 
-      expect(mockPutPage).toBeCalled();
-      expect(mockPutPage).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.pageId, mockRequestBody);
+      expect(mockPutDashboard).toBeCalled();
+      expect(mockPutDashboard).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.dashboardId, mockRequestBody);
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();
@@ -73,12 +73,12 @@ describe('/pages/{pageId} tests', () => {
   describe('DELETE', () => {
     it('returns 200 if successful', async () => {
       mockRequest.params = mockRequestParams;
-      mockDeletePage.mockResolvedValue(mockRequestBody);
+      mockDeleteDashboard.mockResolvedValue(mockRequestBody);
 
-      await PageRoutes().DELETE(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().DELETE(mockRequest, mockResponse, mockNext);
 
-      expect(mockDeletePage).toBeCalled();
-      expect(mockDeletePage).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.pageId);
+      expect(mockDeleteDashboard).toBeCalled();
+      expect(mockDeleteDashboard).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.dashboardId);
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(200);
       expect(mockSend).toBeCalled();
@@ -87,12 +87,12 @@ describe('/pages/{pageId} tests', () => {
     it('calls next function with error if an error is thrown', async () => {
       mockRequest.params = mockRequestParams;
       const mockError = new Error('Error!');
-      mockDeletePage.mockImplementationOnce(() => { throw mockError; });
+      mockDeleteDashboard.mockImplementationOnce(() => { throw mockError; });
 
-      await PageRoutes().DELETE(mockRequest, mockResponse, mockNext);
+      await DashboardRoutes().DELETE(mockRequest, mockResponse, mockNext);
 
-      expect(mockDeletePage).toBeCalled();
-      expect(mockDeletePage).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.pageId);
+      expect(mockDeleteDashboard).toBeCalled();
+      expect(mockDeleteDashboard).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.dashboardId);
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();

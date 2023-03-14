@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import PageController from '../../../../controllers/page-controller.js';
+import ConsoleController from '../../controllers/console-controller.js';
 
 export default function () {
   return {
     async PUT (request: Request, response: Response, next: NextFunction) {
       try {
-        const page = await PageController.putPage(request.params.consoleName, request.params.pageId, request.body);
-        response.status(200).send(page);
+        const console = await ConsoleController.putConsole(request.params.consoleName, request.body);
+        response.status(200).send(console);
       } catch (error) {
         next(error);
       }
@@ -14,8 +14,8 @@ export default function () {
 
     async DELETE (request: Request, response: Response, next: NextFunction) {
       try {
-        const page = await PageController.deletePage(request.params.consoleName, request.params.pageId);
-        response.status(200).send(page);
+        const console = await ConsoleController.deleteConsole(request.params.consoleName);
+        response.status(200).send(console);
       } catch (error) {
         next(error);
       }

@@ -9,16 +9,17 @@ ARG CONFIG_PATH
 ENV CONFIG_PATH=${CONFIG_PATH}
 ENV PORT=8000
 
+WORKDIR /config
+
+COPY ./basicexample.yml .
+
 WORKDIR /app
 
 COPY . .
 
-RUN mv ./.npmrc ./.npmrc.dev
-RUN mv ./.npmrc.prod ./.npmrc
 RUN npm run clean-build
 RUN rm -rf ./src
-# Uncomment once core-plugins repo exists and is installable
-# RUN npm prune --production
+RUN npm prune --production
 
 
 EXPOSE 8000

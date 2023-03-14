@@ -1,8 +1,12 @@
 {
   "name": "ops-api",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "main": "dist/server.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinystacks/ops-api.git"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf ./dist; rm -rf ./store;",
@@ -15,6 +19,7 @@
     "lint-tests": "./node_modules/.bin/eslint --config .eslintrc.test.json ./test",
     "lint-fix-tests": "./node_modules/.bin/eslint --config .eslintrc.test.json --fix ./test",
     "local": "bash ./local.sh",
+    "local-s3": "npm run clean-build; AWS_PROFILE=ts AWS_REGION=us-west-2 CONFIG_PATH=s3://ops-stacks-dev-config-storage-bucket-us-west-2/group:tinystacks-beta/basicexample.yml NODE_ENV=dev node ./dist/server.js",
     "qa": "npm run lint && npm run test-cov",
     "setup-test-lint": "node ./scripts/setup-test-lint.js",
     "staging": "bash ./staging.sh",
@@ -55,11 +60,12 @@
   },
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.267.0",
+    "@aws-sdk/client-s3": "^3.288.0",
     "@aws-sdk/credential-providers": "^3.282.0",
-    "@tinystacks/ops-aws-core-plugins": "0.0.4-release",
-    "@tinystacks/ops-core": "0.0.4-release",
-    "@tinystacks/ops-core-widgets": "0.0.4-release",
-    "@tinystacks/ops-model": "0.0.4-release",
+    "@tinystacks/ops-aws-core-plugins": "^0.0.3",
+    "@tinystacks/ops-core": "^0.0.0",
+    "@tinystacks/ops-core-widgets": "^0.0.0",
+    "@tinystacks/ops-model": "^0.0.0",
     "@types/react": "^18.0.28",
     "body-parser": "^1.20.1",
     "cached": "^6.1.0",

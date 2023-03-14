@@ -21,7 +21,7 @@ describe('widget client tests', () => {
   describe('handleError', () => {
     describe('reuses console client errors when possible', () => {
       it('CONFIG_PATH', () => {
-        const error = HttpError.InternalServerError('Cannot fetch consoles! No value was found for CONFIG_PATH!');
+        const error = HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!');
         let thrownError;
         try {
           WidgetClient.handleError(error);
@@ -35,7 +35,7 @@ describe('widget client tests', () => {
         }
       });
       it('Config file', () => {
-        const error = HttpError.NotFound('Cannot fetch consoles! Config file test.yml not found!');
+        const error = HttpError.NotFound('Cannot fetch console! Config file test.yml not found!');
         let thrownError;
         try {
           WidgetClient.handleError(error);
@@ -76,7 +76,7 @@ describe('widget client tests', () => {
           [mockWidget.id]: mockWidget
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
@@ -89,7 +89,7 @@ describe('widget client tests', () => {
         name: 'mock-console',
         widgets: {},
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
@@ -121,7 +121,7 @@ describe('widget client tests', () => {
           [mockWidget.id]: mockWidget
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
@@ -155,7 +155,7 @@ describe('widget client tests', () => {
         name: 'mock-console',
         widgets: {},
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       const mockSavedConsole = Console.fromJson({
         name: 'mock-console',
@@ -166,7 +166,7 @@ describe('widget client tests', () => {
           }
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       mockGetConsole.mockResolvedValueOnce(mockSavedConsole);
@@ -196,7 +196,7 @@ describe('widget client tests', () => {
           [mockWidget.id]: mockWidget
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       jest.spyOn(WidgetClient, 'getWidget');
@@ -232,7 +232,7 @@ describe('widget client tests', () => {
           [oldMockWidget.id]: oldMockWidget
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       const newMockWidget = GenericWidget.fromJson({
         id: 'mock-id',
@@ -246,7 +246,7 @@ describe('widget client tests', () => {
           [newMockWidget.id]: newMockWidget
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(oldMockConsole);
       mockGetConsole.mockResolvedValueOnce(newMockConsole);
@@ -270,7 +270,7 @@ describe('widget client tests', () => {
         name: 'mock-console',
         widgets: {},
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       jest.spyOn(WidgetClient, 'getWidget');
@@ -306,7 +306,7 @@ describe('widget client tests', () => {
           [mockWidget.id]: mockWidget
         },
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
@@ -321,7 +321,7 @@ describe('widget client tests', () => {
         name: 'mock-console',
         widgets: {},
         providers: {},
-        pages: {}
+        dashboards: {}
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       jest.spyOn(WidgetClient, 'getWidget');

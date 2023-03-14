@@ -8,7 +8,7 @@ appName=$(cat ./package.json | jq -r .name);
 region="${AWS_REGION:-us-east-1}";
 ecrEndpoint="${accountId}.dkr.ecr.${region}.amazonaws.com";
 ecrImageUrl="${ecrEndpoint}/${appName}";
-publicEcrEndpoint="public.ecr.aws/tinystacks/";
+publicEcrEndpoint="public.ecr.aws/tinystacks";
 publicEcrImageUrl="${publicEcrEndpoint}/${appName}";
 
 # Log in to Dev private registry
@@ -28,6 +28,13 @@ docker image tag "$ecrImageUrl:$sourceTag-x86" "$publicEcrImageUrl:$x86Tag";
 armTag="$version-arm";
 docker image tag "$ecrImageUrl:$sourceTag-arm" "$publicEcrImageUrl:$armTag";
 
+if [ "$version" != "latest" ]
+  then
+    # Push latest-arch images
+    docker image tag "$ecrImageUrl:$sourceTag-x86" "$publicEcrImageUrl:latest-x86";
+    docker image tag "$ecrImageUrl:$sourceTag-arm" "$publicEcrImageUrl:latest-arm";
+fi
+
 docker push $publicEcrImageUrl --all-tags;
 
 # Create public manifest
@@ -39,6 +46,7 @@ docker manifest push $publicEcrImageUrl:$version
 
 if [ "$version" != "latest" ]
   then
+    # Create and push manifest
     docker manifest create $publicEcrImageUrl:latest $publicEcrImageUrl:$armTag $publicEcrImageUrl:$x86Tag    
     docker manifest annotate --arch arm64 $publicEcrImageUrl:latest $publicEcrImageUrl:$armTag
     docker manifest annotate --arch amd64 $publicEcrImageUrl:latest $publicEcrImageUrl:$x86Tag
