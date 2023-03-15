@@ -6,10 +6,9 @@ jest.mock('../../src/clients/console-client', () => ({
   saveConsole: mockSaveConsole
 }));
 
-import Console from '../../src/classes/console';
-import Dashboard from '../../src/classes/dashboard';
 import DashboardClient from '../../src/clients/dashboard-client';
 import HttpError from 'http-errors';
+import { ConsoleParser, DashboardParser } from '@tinystacks/ops-core';
 
 describe('dashboard client tests', () => {
   afterEach(() => {
@@ -64,12 +63,12 @@ describe('dashboard client tests', () => {
   });
   describe('getDashboard', () => {
     it('returns dashboard from console matching the route specified', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: mockDashboard
@@ -84,7 +83,7 @@ describe('dashboard client tests', () => {
       expect(result).toEqual(mockDashboard);
     });
     it('throws not found if dashboard does not exist on the console', async () => {
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {},
         providers: {},
@@ -108,11 +107,12 @@ describe('dashboard client tests', () => {
 
   describe('getDashboards', () => {
     it('returns dashboards from console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: mockDashboard
@@ -143,17 +143,18 @@ describe('dashboard client tests', () => {
   });
   describe('createDashboard', () => {
     it('saves dashboard to console and returns saved dashboard', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {},
         providers: {},
         widgets: {}
       });
-      const mockSavedConsole = Console.fromJson({
+      const mockSavedConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: { 
@@ -180,11 +181,12 @@ describe('dashboard client tests', () => {
       });
     });
     it('throws Conflict if dashboard with id already exists on console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: mockDashboard
@@ -212,11 +214,12 @@ describe('dashboard client tests', () => {
       }
     });
     it('throws Conflict if dashboard with route already exists on console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MainDashboard: mockDashboard
@@ -246,12 +249,12 @@ describe('dashboard client tests', () => {
   });
   describe('updateDashboard', () => {
     it('saves dashboard to console and returns saved dashboard', async () => {
-      const oldMockDashboard = Dashboard.fromJson({
+      const oldMockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const oldMockConsole = Console.fromJson({
+      const oldMockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: oldMockDashboard
@@ -259,12 +262,12 @@ describe('dashboard client tests', () => {
         providers: {},
         widgets: {}
       });
-      const newMockDashboard = Dashboard.fromJson({
+      const newMockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: ['widget-1']
       }); 
-      const newMockConsole = Console.fromJson({
+      const newMockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: newMockDashboard
@@ -284,12 +287,12 @@ describe('dashboard client tests', () => {
       expect(result).toEqual(newMockDashboard);
     });
     it('throws NotFound if dashboard does not exist on console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {},
         providers: {},
@@ -317,12 +320,12 @@ describe('dashboard client tests', () => {
   });
   describe('deleteDashboard', () => {
     it('deletes dashboard from console and returns deleted dashboard', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {
           MockRoute: mockDashboard
@@ -339,7 +342,7 @@ describe('dashboard client tests', () => {
       expect(result).toEqual(mockDashboard);
     });
     it('throws NotFound if dashboard does not exist on console', async () => {
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         dashboards: {},
         providers: {},

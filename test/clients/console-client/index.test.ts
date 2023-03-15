@@ -8,10 +8,10 @@ jest.mock('../../../src/clients/console-client/local.ts', () => ({
   deleteLocalConsole: mockDeleteLocalConsole
 }));
 
-import Console from '../../../src/classes/console';
+import { ConsoleParser } from '@tinystacks/ops-core';
 import ConsoleClient from '../../../src/clients/console-client';
 
-const mockConsole = Console.fromJson({
+const mockConsole = await ConsoleParser.fromJson({
   name: 'mock-console',
   dashboards: {},
   providers: {},
@@ -27,8 +27,7 @@ describe('console client tests', () => {
   });
   it('getConsole', async () => {
     mockGetLocalConsole.mockResolvedValue(mockConsole);
-
-    const result = await ConsoleClient.getConsole('mock-console');
+    const result = await new ConsoleClient().getConsole('mock-console');
     
     expect(mockGetLocalConsole).toBeCalled();
     expect(mockGetLocalConsole).toBeCalledWith();
@@ -38,7 +37,7 @@ describe('console client tests', () => {
     it('returns array of console', async () => {
       mockGetLocalConsole.mockResolvedValue(mockConsole);
       
-      const result = await ConsoleClient.getConsoles();
+      const result = await new ConsoleClient().getConsoles();
       
       expect(mockGetLocalConsole).toBeCalled();
       expect(mockGetLocalConsole).toBeCalledWith();
@@ -47,7 +46,7 @@ describe('console client tests', () => {
     it('returns empty array if console is empty', async () => {
       mockGetLocalConsole.mockResolvedValue(undefined);
       
-      const result = await ConsoleClient.getConsoles();
+      const result = await new ConsoleClient().getConsoles();
       
       expect(mockGetLocalConsole).toBeCalled();
       expect(mockGetLocalConsole).toBeCalledWith();
@@ -55,13 +54,13 @@ describe('console client tests', () => {
     });
   });
   it('saveConsole', async () => {
-    await ConsoleClient.saveConsole('mock-console', mockConsole);
+    await new ConsoleClient().saveConsole('mock-console', mockConsole);
     
     expect(mockSaveLocalConsole).toBeCalled();
     expect(mockSaveLocalConsole).toBeCalledWith(mockConsole);
   });
   it('deleteConsole', async () => {
-    await ConsoleClient.deleteConsole('mock-console');
+    await new ConsoleClient().deleteConsole('mock-console');
     
     expect(mockDeleteLocalConsole).toBeCalled();
     expect(mockDeleteLocalConsole).toBeCalledWith('mock-console');

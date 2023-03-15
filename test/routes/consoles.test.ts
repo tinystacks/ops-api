@@ -22,9 +22,7 @@ let mockRequest = {} as Request;
 const mockRequestBody = {
   name: 'mock-console'
 };
-const mockRequestParams = {
-  consoleName: 'mock-console'
-};
+
 const mockResponse = {
   status: mockStatus,
   send: mockSend
@@ -90,66 +88,6 @@ describe('/consoles tests', () => {
 
       expect(mockPostConsole).toBeCalled();
       expect(mockPostConsole).toBeCalledWith(mockRequestBody);
-      expect(mockStatus).not.toBeCalled();
-      expect(mockSend).not.toBeCalled();
-      expect(mockNext).toBeCalled();
-      expect(mockNext).toBeCalledWith(mockError);
-    });
-  });
-  describe('PUT', () => {
-    it('returns 200 if successful', async () => {
-      mockRequest.body = mockRequestBody;
-      mockRequest.params = mockRequestParams;
-      mockPutConsole.mockResolvedValue(mockRequestBody);
-
-      await ConsoleRoutes().PUT(mockRequest, mockResponse, mockNext);
-
-      expect(mockPutConsole).toBeCalled();
-      expect(mockPutConsole).toBeCalledWith(mockRequestParams.consoleName, mockRequestBody);
-      expect(mockStatus).toBeCalled();
-      expect(mockStatus).toBeCalledWith(200);
-      expect(mockSend).toBeCalled();
-      expect(mockSend).toBeCalledWith(mockRequestBody);
-    });
-    it('calls next function with error if an error is thrown', async () => {
-      mockRequest.body = mockRequestBody;
-      mockRequest.params = mockRequestParams;
-      const mockError = new Error('Error!');
-      mockPutConsole.mockImplementationOnce(() => { throw mockError; });
-
-      await ConsoleRoutes().PUT(mockRequest, mockResponse, mockNext);
-
-      expect(mockPutConsole).toBeCalled();
-      expect(mockPutConsole).toBeCalledWith(mockRequestParams.consoleName, mockRequestBody);
-      expect(mockStatus).not.toBeCalled();
-      expect(mockSend).not.toBeCalled();
-      expect(mockNext).toBeCalled();
-      expect(mockNext).toBeCalledWith(mockError);
-    });
-  });
-  describe('DELETE', () => {
-    it('returns 200 if successful', async () => {
-      mockRequest.params = mockRequestParams;
-      mockDeleteConsole.mockResolvedValue(mockRequestBody);
-
-      await ConsoleRoutes().DELETE(mockRequest, mockResponse, mockNext);
-
-      expect(mockDeleteConsole).toBeCalled();
-      expect(mockDeleteConsole).toBeCalledWith(mockRequestParams.consoleName);
-      expect(mockStatus).toBeCalled();
-      expect(mockStatus).toBeCalledWith(200);
-      expect(mockSend).toBeCalled();
-      expect(mockSend).toBeCalledWith(mockRequestBody);
-    });
-    it('calls next function with error if an error is thrown', async () => {
-      mockRequest.params = mockRequestParams;
-      const mockError = new Error('Error!');
-      mockDeleteConsole.mockImplementationOnce(() => { throw mockError; });
-
-      await ConsoleRoutes().DELETE(mockRequest, mockResponse, mockNext);
-
-      expect(mockDeleteConsole).toBeCalled();
-      expect(mockDeleteConsole).toBeCalledWith(mockRequestParams.consoleName);
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();

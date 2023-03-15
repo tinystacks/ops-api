@@ -1,20 +1,21 @@
+import WidgetClient from '../../src/clients/widget-client.js';
+import HttpError from 'http-errors';
+import { BasicWidget } from '../utils/basic-widget';
+import { ConsoleParser } from '@tinystacks/ops-core';
+
 const mockGetConsole = jest.fn();
 const mockSaveConsole = jest.fn();
-
-jest.mock('../../src/clients/console-client', () => ({
-  getConsole: mockGetConsole,
-  saveConsole: mockSaveConsole
-}));
-
-import Console from '../../src/classes/console';
-import GenericWidget from '../../src/classes/generic-widget';
-import WidgetClient from '../../src/clients/widget-client';
-import HttpError from 'http-errors';
 
 describe('widget client tests', () => {
   afterEach(() => {
     // for mocks
     jest.resetAllMocks();
+
+    jest.mock('../../src/clients/console-client/local.js', () => ({
+      getConsole: mockGetConsole,
+      saveConsole: mockSaveConsole
+    }));
+
     // for spies
     jest.restoreAllMocks();
   });
@@ -64,13 +65,12 @@ describe('widget client tests', () => {
   });
   describe('getWidget', () => {
     it('returns widget from console matching the id specified', async () => {
-      const mockWidget = GenericWidget.fromJson({
+      const mockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+        type: 'MockWidget'
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           [mockWidget.id]: mockWidget
@@ -85,7 +85,7 @@ describe('widget client tests', () => {
       expect(result).toEqual(mockWidget);
     });
     it('throws not found if widget does not exist on the console', async () => {
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {},
         providers: {},
@@ -109,13 +109,12 @@ describe('widget client tests', () => {
 
   describe('getWidgets', () => {
     it('returns widgets from console', async () => {
-      const mockWidget = GenericWidget.fromJson({
+      const mockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+        type: 'MockWidget'
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           [mockWidget.id]: mockWidget
@@ -146,18 +145,18 @@ describe('widget client tests', () => {
   });
   describe('createWidget', () => {
     it('saves widget to console and returns saved widget', async () => {
-      const mockWidget = GenericWidget.fromJson({
+      const mockWidget = BasicWidget.fromJson({
         displayName: 'Mock Widget',
         type: 'MockWidget',
-        providerId: 'MockProvider'
+        id: 'MockWidget'
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {},
         providers: {},
         dashboards: {}
       });
-      const mockSavedConsole = Console.fromJson({
+      const mockSavedConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           'MockWidget': {
@@ -184,13 +183,12 @@ describe('widget client tests', () => {
       });
     });
     it('throws Conflict if widget already exists on console', async () => {
-      const mockWidget = GenericWidget.fromJson({
+      const mockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+        type: 'MockWidget'
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           [mockWidget.id]: mockWidget
@@ -220,13 +218,12 @@ describe('widget client tests', () => {
   });
   describe('updateWidget', () => {
     it('saves widget to console and returns saved widget', async () => {
-      const oldMockWidget = GenericWidget.fromJson({
+      const oldMockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+        type: 'MockWidget'
       });
-      const oldMockConsole = Console.fromJson({
+      const oldMockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           [oldMockWidget.id]: oldMockWidget
@@ -234,13 +231,12 @@ describe('widget client tests', () => {
         providers: {},
         dashboards: {}
       });
-      const newMockWidget = GenericWidget.fromJson({
+      const newMockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget 2',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+        type: 'MockWidget'
       });
-      const newMockConsole = Console.fromJson({
+      const newMockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           [newMockWidget.id]: newMockWidget
@@ -260,13 +256,12 @@ describe('widget client tests', () => {
       expect(result).toEqual(newMockWidget);
     });
     it('throws NotFound if widget does not exist on console', async () => {
-      const mockWidget = GenericWidget.fromJson({
+      const mockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+        type: 'MockWidget'
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {},
         providers: {},
@@ -294,13 +289,12 @@ describe('widget client tests', () => {
   });
   describe('deleteWidget', () => {
     it('deletes widget from console and returns deleted widget', async () => {
-      const mockWidget = GenericWidget.fromJson({
+      const mockWidget = BasicWidget.fromJson({
         id: 'mock-id',
         displayName: 'Mock Widget',
         type: 'MockWidget',
-        providerId: 'MockProvider'
       });
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {
           [mockWidget.id]: mockWidget
@@ -317,7 +311,7 @@ describe('widget client tests', () => {
       expect(result).toEqual(mockWidget);
     });
     it('throws NotFound if widget does not exist on console', async () => {
-      const mockConsole = Console.fromJson({
+      const mockConsole = ConsoleParser.fromJson({
         name: 'mock-console',
         widgets: {},
         providers: {},

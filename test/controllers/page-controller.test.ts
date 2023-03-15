@@ -27,6 +27,7 @@ describe('dashboard controller tests', () => {
   });
   it('postDashboard', async () => {
     const requestBody: Dashboard = {
+      id: 'mock-dashboard',
       route: '/mock-dashboard',
       widgetIds: []
     };
@@ -36,6 +37,7 @@ describe('dashboard controller tests', () => {
   });
   it('putDashboard', async () => {
     const requestBody: Dashboard = {
+      id: 'mock-dashboard',
       route: '/mock-dashboard',
       widgetIds: []
     };
