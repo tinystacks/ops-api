@@ -10,7 +10,7 @@ class ConsoleClient implements IConsoleClient {
   getConsoles: () => Promise<ConsoleParser[]>;
   getConsole: (consoleName: string) => Promise<ConsoleParser>;
   saveConsole: (consoleName: string, console: ConsoleParser) => Promise<ConsoleParser>;
-  deleteConsole: (_onsoleName: string) => Promise<ConsoleParser>;
+  public deleteConsole: (_consoleName: string) => Promise<ConsoleParser>;
 
   constructor () {
     const configPath = process.env.CONFIG_PATH;
