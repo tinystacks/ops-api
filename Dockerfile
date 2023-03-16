@@ -8,6 +8,8 @@ ENV NODE_ENV=${NODE_ENV}
 ARG CONFIG_PATH
 ENV CONFIG_PATH=${CONFIG_PATH}
 ENV PORT=8000
+ARG ARCH=x86
+ENV ARCH=${ARCH}
 
 WORKDIR /config
 
@@ -27,15 +29,10 @@ RUN echo Y | apt-get install unzip
 # AWS CLI
 RUN echo Y | apt-get install awscli
 RUN aws --version
-# RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# RUN unzip awscliv2.zip
-# RUN ./aws/install
-
 # SSM
-# RUN echo Y | apt-get install dpkg
-# RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-# RUN dpkg -i session-manager-plugin.deb
-# RUN session-manager-plugin
+RUN if [ $ARCH = "x86" ]; then curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install; fi
+RUN echo Y | apt-get install dpkg
+RUN if [ $ARCH = "x86" ]; then curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" && dpkg -i session-manager-plugin.deb; fi
 
 # BUILD
 RUN npm run clean-build
