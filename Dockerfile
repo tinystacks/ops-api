@@ -25,15 +25,17 @@ RUN echo Y | apt-get install alien
 RUN echo Y | apt-get install unzip
 
 # AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-RUN unzip awscliv2.zip
-RUN ./aws/install
+RUN echo Y | apt-get install awscli
+RUN aws --version
+# RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# RUN unzip awscliv2.zip
+# RUN ./aws/install
 
 # SSM
-RUN echo Y | apt-get install dpkg
-RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-RUN dpkg -i session-manager-plugin.deb
-RUN session-manager-plugin
+# RUN echo Y | apt-get install dpkg
+# RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+# RUN dpkg -i session-manager-plugin.deb
+# RUN session-manager-plugin
 
 # BUILD
 RUN npm run clean-build
