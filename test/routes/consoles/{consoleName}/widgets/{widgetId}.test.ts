@@ -5,7 +5,7 @@ const mockGetWidget = jest.fn();
 const mockPutWidget = jest.fn();
 const mockDeleteWidget = jest.fn();
 
-jest.mock('../../../../../src/controllers/widget-controller.ts', () => ({
+jest.mock('../../../../../src/controllers/widget-controller.js', () => ({
   getWidget: mockGetWidget,
   putWidget: mockPutWidget,
   deleteWidget: mockDeleteWidget
@@ -13,7 +13,7 @@ jest.mock('../../../../../src/controllers/widget-controller.ts', () => ({
 
 jest.mock('express');
 
-import WidgetRoutes from '../../../../../src/routes/consoles/{consoleName}/widgets/{widgetId}';
+import WidgetRoutes from '../../../../../src/routes/consoles/{consoleName}/widgets/{widgetId}.js';
 import { Request, Response } from 'express';
 
 let mockRequest = {} as Request;
@@ -49,7 +49,7 @@ describe('/widgets/{widgetId} tests', () => {
       await WidgetRoutes().GET(mockRequest, mockResponse, mockNext);
 
       expect(mockGetWidget).toBeCalled();
-      expect(mockGetWidget).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.widgetId);
+      expect(mockGetWidget).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.widgetId, undefined);
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(200);
       expect(mockSend).toBeCalled();
@@ -63,7 +63,7 @@ describe('/widgets/{widgetId} tests', () => {
       await WidgetRoutes().GET(mockRequest, mockResponse, mockNext);
 
       expect(mockGetWidget).toBeCalled();
-      expect(mockGetWidget).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.widgetId);
+      expect(mockGetWidget).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.widgetId, undefined);
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();
