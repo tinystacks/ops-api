@@ -14,6 +14,7 @@ docker login -u AWS -p $(aws ecr get-login-password --region $region) $ecrEndpoi
 docker build \
   --progress plain \
   --build-arg NPM_TOKEN=${NPM_TOKEN} \
+  --build-arg ARCH=${ARCH} \
   -t "$appName:$commitSha-${ARCH}" \
   -t "$appName:$version-${ARCH}" \
   -t "$appName:latest-${ARCH}" . \
