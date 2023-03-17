@@ -19,20 +19,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN echo Y | apt-get update
-RUN echo Y | apt-get install apt-utils
-RUN echo Y | apt-get install jq
-RUN echo Y | apt-get install curl
-RUN echo Y | apt-get install alien
-RUN echo Y | apt-get install unzip
-
-# AWS CLI
-RUN echo Y | apt-get install awscli
-RUN aws --version
-# SSM
-RUN if [ $ARCH = "x86" ]; then curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install; fi
-RUN echo Y | apt-get install dpkg
-RUN if [ $ARCH = "x86" ]; then curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" && dpkg -i session-manager-plugin.deb; fi
+# Install CLI dependencies
+RUN chmod +x ./install-cli-tools.sh
+RUN bash ./install-cli-tools.sh
 
 # BUILD
 RUN npm run clean-build
