@@ -7,24 +7,36 @@ import S3ConsoleClient from './s3.js';
  * TODO: Eventually this becomes a proxy class which based on the environment returns a specific client i.e. local vs github vs s3 etc.
  */
 class ConsoleClient implements IConsoleClient {
-  getConsoles: () => Promise<ConsoleParser[]>;
-  getConsole: (consoleName: string) => Promise<ConsoleParser>;
-  saveConsole: (consoleName: string, console: ConsoleParser) => Promise<ConsoleParser>;
-  deleteConsole: (_onsoleName: string) => Promise<ConsoleParser>;
+  client: IConsoleClient;
+  async getConsoles (): Promise<ConsoleParser[]> {
+    return this.client.getConsoles();
+  }
+
+  async getConsole (consoleName: string): Promise<ConsoleParser> {
+    return this.client.getConsole(consoleName);
+  }
+
+  async saveConsole (consoleName: string, console: ConsoleParser): Promise<ConsoleParser> {
+    return this.client.saveConsole(consoleName, console);
+  }
+
+  async deleteConsole (consoleName: string): Promise<ConsoleParser> {
+    return this.client.deleteConsole(consoleName);
+  }
 
   constructor () {
     const configPath = process.env.CONFIG_PATH;
-    let client: IConsoleClient;
-    if (configPath.startsWith('s3://')) {
-      client = new S3ConsoleClient();
+    if (!!configPath && configPath.startsWith('s3://')) {
+      this.client = new S3ConsoleClient();
     } else {
-      client = new LocalConsoleClient();
+      this.client = new LocalConsoleClient();
     }
 
-    this.getConsole = client.getConsole.bind(client);
-    this.getConsoles = client.getConsoles.bind(client);
-    this.saveConsole = client.saveConsole.bind(client);
-    this.deleteConsole = client.deleteConsole.bind(client);
+    // TODO: Re-enable once we can get bind to play nicely with jest
+    // this.getConsole = client.getConsole.bind(client);
+    // this.getConsoles = client.getConsoles.bind(client);
+    // this.saveConsole = client.saveConsole.bind(client);
+    // this.deleteConsole = client.deleteConsole.bind(client);
   }
 }
 

@@ -2,7 +2,7 @@ const mockGetConsoles = jest.fn();
 const mockSaveConsole = jest.fn();
 const mockDeleteConsole = jest.fn();
 
-jest.mock('../../src/clients/console-client.js', () => ({
+jest.mock('../../src/clients/console-client', () => ({
   getConsoles: mockGetConsoles,
   saveConsole: mockSaveConsole,
   deleteConsole: mockDeleteConsole
@@ -19,7 +19,6 @@ describe('console controller tests', () => {
     jest.restoreAllMocks();
   });
   it('getConsole', async () => {
-    mockGetConsoles.mockResolvedValueOnce([{ toJson: () => '' }]);
     await ConsoleController.getConsoles();
     expect(mockGetConsoles).toBeCalled();
   });
