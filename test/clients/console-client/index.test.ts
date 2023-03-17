@@ -3,14 +3,7 @@ const mockGetLocalConsoles = jest.fn();
 const mockSaveLocalConsole = jest.fn();
 const mockDeleteLocalConsole = jest.fn();
 
-// const mockLocalClient = jest.fn();
-// mockLocalClient.mockImplementation(() => ({
-//   getConsole: mockGetLocalConsole,
-//   getConsoles: mockGetLocalConsoles,
-//   saveConsole: mockSaveLocalConsole,
-//   deleteConsole: mockDeleteLocalConsole
-// }));
-const mockLocalClient = jest.mock('../../../src/clients/console-client/local.js', () => jest.fn().mockImplementation(() => ({
+jest.mock('../../../src/clients/console-client/local.js', () => jest.fn().mockImplementation(() => ({
   getConsole: mockGetLocalConsole,
   getConsoles: mockGetLocalConsoles,
   saveConsole: mockSaveLocalConsole,
