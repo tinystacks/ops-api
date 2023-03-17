@@ -7,11 +7,6 @@ echo Y | apt-get install curl;
 echo Y | apt-get install alien;
 echo Y | apt-get install unzip;
 
-# # AWS CLI
-# echo Y | apt-get install awscli;
-# echo "aws-cli version: $(aws --version)";
-
-# SSM
 if [[ "$ARCH" == "x86" ]];
   then
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
