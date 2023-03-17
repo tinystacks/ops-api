@@ -1,8 +1,7 @@
 import WidgetClient from '../../src/clients/widget-client.js';
 import HttpError from 'http-errors';
-import { BasicWidget } from '../utils/basic-widget';
+import { BasicWidget } from '../utils/basic-widget.js';
 import { ConsoleParser } from '@tinystacks/ops-core';
-
 const mockGetConsole = jest.fn();
 const mockSaveConsole = jest.fn();
 

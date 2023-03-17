@@ -2,14 +2,14 @@ const mockGetConsoles = jest.fn();
 const mockSaveConsole = jest.fn();
 const mockDeleteConsole = jest.fn();
 
-jest.mock('../../src/clients/console-client', () => ({
+jest.mock('../../src/clients/console-client.js', () => ({
   getConsoles: mockGetConsoles,
   saveConsole: mockSaveConsole,
   deleteConsole: mockDeleteConsole
 }));
 
 import { Console } from '@tinystacks/ops-model';
-import ConsoleController from '../../src/controllers/console-controller';
+import ConsoleController from '../../src/controllers/console-controller.js';
 
 describe('console controller tests', () => {
   afterEach(() => {
@@ -19,6 +19,7 @@ describe('console controller tests', () => {
     jest.restoreAllMocks();
   });
   it('getConsole', async () => {
+    mockGetConsoles.mockResolvedValueOnce([{ toJson: () => '' }]);
     await ConsoleController.getConsoles();
     expect(mockGetConsoles).toBeCalled();
   });
@@ -29,6 +30,7 @@ describe('console controller tests', () => {
       providers: {},
       widgets: {}
     };
+    // mock.mockResolvedValueOnce({ toJson: () => '' });
     await ConsoleController.postConsole(requestBody);
     expect(mockSaveConsole).toBeCalled();
     expect(mockSaveConsole).toBeCalledWith(requestBody.name, requestBody);

@@ -4,7 +4,7 @@ jest.mock('fs', () => ({
   readFileSync: mockReadFileSync
 }));
 
-import FsUtils from '../../src/utils/fs-utils';
+import FsUtils from '../../src/utils/fs-utils.js';
 
 describe('FsUtils tests', () => {
   beforeEach(() => {
