@@ -226,4 +226,7 @@ class S3ConsoleClient implements IConsoleClient {
   }
 }
 
+export {
+  S3ConsoleClient
+};
 export default S3ConsoleClient;

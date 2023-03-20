@@ -66,4 +66,7 @@ class LocalConsoleClient implements IConsoleClient {
   }
 }
 
+export {
+  LocalConsoleClient
+};
 export default LocalConsoleClient;
