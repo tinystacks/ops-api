@@ -22,10 +22,6 @@ jest.mock('fs', () => ({
 }));
 
 const mockGetConsole = jest.fn();
-jest.mock('../../../src/clients/console-client/local.js', () => jest.fn().mockImplementation(() =>({
-  getConsole: mockGetConsole
-})));
-
 
 import { Console } from '@tinystacks/ops-model';
 import LocalConsoleClient from '../../../src/clients/console-client/local';
