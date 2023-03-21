@@ -152,14 +152,14 @@ describe('local console client tests', () => {
       const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
       let thrownError;
       try {
-        await localConsoleClient.getConsole(mockConsole.name);
+        await localConsoleClient.saveConsole('mock-console', mockConsole);
       } catch (error) {
         thrownError = error;
       } finally {
         expect(mockResolve).not.toBeCalled();
         expect(mockTryToReadFile).not.toBeCalled();
         expect(thrownError).toBeDefined();
-        expect(thrownError).toEqual(HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!'));
+        expect(thrownError).toEqual(HttpError.InternalServerError('Cannot save console mock-console! No value was found for CONFIG_PATH!'));
       }
     });
     it('writes to file and returns saved Console on success', async () => {
