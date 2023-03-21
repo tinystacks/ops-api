@@ -79,33 +79,56 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
+  // recursively look through properties for refs <- recA
+  //   recursively for every ref:
+  //      recA
+  //      resolve ref by calling getData
   async hydrateWidgetReferences (widget: any, consoleWidgets: Record<string, BaseWidget>, consoleProviders: Record<string, BaseProvider>,  overrides?: any) {
-
     const referencedWidgets: Record<string, Widget> = {};
-    for (const property in widget) {
-      if (typeof widget[property] === 'object' && '$ref' in widget[property]) {
-        const [_, __, ___, widgetId] = widget[property].$ref.split('/');
-        const refWidget = consoleWidgets[widgetId];
-        let fullRefWidget;
-        if (referencedWidgets[refWidget.id]) {
-          fullRefWidget = referencedWidgets[refWidget.id];
-        } else {
-          fullRefWidget = await this.hydrateWidgetReferences(refWidget, consoleWidgets, consoleProviders);
-          referencedWidgets[fullRefWidget.id] = fullRefWidget;
-        }
-        if ('path' in widget[property]) {
-          const value = get(fullRefWidget, widget[property].path);
-          widget[property] = value;
-        } else {
-          widget[property] = fullRefWidget;
-        }
-      }
-    }
-    const hydratedProviders = (widget.providerIds || []).map((providerId: string) => {
+    const resolvedWidget = await this.resolveWidgetPropertyReferences(widget, consoleWidgets, consoleProviders, referencedWidgets);
+
+
+    const hydratedProviders = ((resolvedWidget as Widget).providerIds || []).map((providerId: string) => {
       return consoleProviders[providerId];
     });
     await widget.getData(hydratedProviders,  overrides);
     return widget;
+  },
+  async resolveWidgetPropertyReferences (
+    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>, 
+    referencedWidgets: Record<string, Widget>
+  ): Promise<any> {
+    if (typeof(property) === 'object') {
+      // TODO: Sort out this ref tracing in core
+      // TODO: Cycle detection (also in core)
+      if (Array.isArray(property)) {
+        for (const i in property) {
+          property[i] = await this.resolveWidgetPropertyReferences(property[i], widgets, providers, referencedWidgets);
+        }
+        return property;
+      }
+      else if ('$ref' in property) {
+        return await this.resolveWidgetPropertyReference(property, widgets, providers, referencedWidgets);
+      } else {
+        for (const p in property) {
+          property[p] = await this.resolveWidgetPropertyReferences(property[p], widgets, providers, referencedWidgets);
+        }
+      }
+    }
+
+    return property;
+  },
+  async resolveWidgetPropertyReference (
+    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>, 
+    referencedWidgets: Record<string, Widget>
+  ) {
+    const widgetId = property.$ref.split('/')[3];
+    const refWidget = widgets[widgetId];
+    if (!referencedWidgets[refWidget.id]) {
+      referencedWidgets[refWidget.id] = await this.hydrateWidgetReferences(refWidget, widgets, providers);
+    }
+    const fullRefWidget = referencedWidgets[refWidget.id];
+    return ('path' in property) ? get(fullRefWidget, property.path) : fullRefWidget;
   }
 };
 

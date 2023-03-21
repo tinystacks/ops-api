@@ -8,6 +8,8 @@ ENV NODE_ENV=${NODE_ENV}
 ARG CONFIG_PATH
 ENV CONFIG_PATH=${CONFIG_PATH}
 ENV PORT=8000
+ARG ARCH
+ENV ARCH=${ARCH}
 
 WORKDIR /config
 
@@ -17,6 +19,11 @@ WORKDIR /app
 
 COPY . .
 
+# Install CLI dependencies
+RUN chmod +x ./install-cli-tools.sh
+RUN bash ./install-cli-tools.sh
+
+# BUILD
 RUN npm run clean-build
 RUN rm -rf ./src
 RUN npm prune --production

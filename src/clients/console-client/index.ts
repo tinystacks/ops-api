@@ -8,21 +8,10 @@ import { S3ConsoleClient } from './s3.js';
  */
 class ConsoleClient implements IConsoleClient {
   client: IConsoleClient;
-  async getConsoles (): Promise<ConsoleParser[]> {
-    return this.client.getConsoles();
-  }
-
-  async getConsole (consoleName: string): Promise<ConsoleParser> {
-    return this.client.getConsole(consoleName);
-  }
-
-  async saveConsole (consoleName: string, console: ConsoleParser): Promise<ConsoleParser> {
-    return this.client.saveConsole(consoleName, console);
-  }
-
-  async deleteConsole (consoleName: string): Promise<ConsoleParser> {
-    return this.client.deleteConsole(consoleName);
-  }
+  getConsoles: () => Promise<ConsoleParser[]>;
+  getConsole: (consoleName: string) => Promise<ConsoleParser>;
+  saveConsole: (consoleName: string, console: ConsoleParser) => Promise<ConsoleParser>;
+  deleteConsole: (_consoleName: string) => Promise<ConsoleParser>;
 
   constructor () {
     const configPath = process.env.CONFIG_PATH;
@@ -32,7 +21,6 @@ class ConsoleClient implements IConsoleClient {
       this.client = new LocalConsoleClient();
     }
 
-    // TODO: Re-enable once we can get bind to play nicely with jest
     this.getConsole = this.client.getConsole.bind(this.client);
     this.getConsoles = this.client.getConsoles.bind(this.client);
     this.saveConsole = this.client.saveConsole.bind(this.client);

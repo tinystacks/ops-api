@@ -38,7 +38,7 @@ class LocalConsoleClient implements IConsoleClient {
   }
   async saveConsole (consoleName: string, console: ConsoleParser): Promise<ConsoleParser> {
     console.name = consoleName;
-    const yamlConsole = await ConsoleParser.toYaml(console);
+    const yamlConsole = await console.toYaml();
     const consoleYml = yaml.dump({ Console: yamlConsole });
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot save console ${console.name}! No value was found for CONFIG_PATH!`);
