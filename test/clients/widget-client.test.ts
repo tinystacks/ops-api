@@ -1,20 +1,51 @@
 const mockGetConsole = jest.fn();
 const mockSaveConsole = jest.fn();
+const mockConsoleClient = jest.fn();
 
-jest.mock('../../src/clients/console-client', () => ({
-  getConsole: mockGetConsole,
-  saveConsole: mockSaveConsole
-}));
+jest.mock('../../src/clients/console-client/index.js', () => mockConsoleClient);
 
-import Console from '../../src/classes/console';
-import GenericWidget from '../../src/classes/generic-widget';
-import WidgetClient from '../../src/clients/widget-client';
+import WidgetClient from '../../src/clients/widget-client.js';
 import HttpError from 'http-errors';
+import { BasicWidget } from '../utils/basic-widget.js';
+import { ConsoleParser } from '@tinystacks/ops-core';
+import { Widget, Console } from '@tinystacks/ops-model';
+
+const basicConsole = {
+  name: 'mock-console',
+  widgets: {},
+  providers: {},
+  dashboards: {},
+  dependencies: {}
+};
+
+const basicWidget: Widget = {
+  id: 'mock-id',
+  displayName: 'Mock Widget',
+  type: 'BasicWidget'
+};
+const basicConsoleWithWidget: Console = {
+  ...basicConsole,
+  widgets: {
+    [basicWidget.id]: basicWidget
+  },
+  dependencies: {
+    BasicWidget: require.resolve('../utils/basic-widget.js')
+  }
+};
 
 describe('widget client tests', () => {
+  beforeEach(() => {
+    jest.spyOn(WidgetClient, 'getWidget');
+    
+    mockConsoleClient.mockReturnValue({
+      getConsole: mockGetConsole,
+      saveConsole: mockSaveConsole
+    });
+  });
   afterEach(() => {
     // for mocks
     jest.resetAllMocks();
+
     // for spies
     jest.restoreAllMocks();
   });
@@ -30,7 +61,7 @@ describe('widget client tests', () => {
         } finally {
           expect(thrownError).toBeDefined();
           expect(thrownError).toEqual(
-            HttpError.InternalServerError('Cannot fetch widgets! No value was found for CONFIG_PATH!')
+            HttpError.InternalServerError('Cannot fetch widget! No value was found for CONFIG_PATH!')
           );
         }
       });
@@ -44,7 +75,7 @@ describe('widget client tests', () => {
         } finally {
           expect(thrownError).toBeDefined();
           expect(thrownError).toEqual(
-            HttpError.NotFound('Cannot fetch widgets! Config file test.yml not found!')
+            HttpError.NotFound('Cannot fetch widget! Config file test.yml not found!')
           );
         }
       });
@@ -64,38 +95,20 @@ describe('widget client tests', () => {
   });
   describe('getWidget', () => {
     it('returns widget from console matching the id specified', async () => {
-      const mockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {
-          [mockWidget.id]: mockWidget
-        },
-        providers: {},
-        dashboards: {}
-      });
+      const mockWidget = basicWidget;
+      const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-
-      const result = await WidgetClient.getWidget('mock-console', 'mock-id');
+      const result = await WidgetClient.getWidget(basicConsoleWithWidget.name, basicWidget.id);
 
       expect(result).toEqual(mockWidget);
     });
     it('throws not found if widget does not exist on the console', async () => {
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {},
-        providers: {},
-        dashboards: {}
-      });
+      const mockConsole = ConsoleParser.fromJson(basicConsole);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
       let thrownError;
       try {
-        await WidgetClient.getWidget('mock-console', 'mock-id');
+        await WidgetClient.getWidget('mock-console', basicWidget.id);
       } catch (error) {
         thrownError = error;
       } finally {
@@ -109,23 +122,11 @@ describe('widget client tests', () => {
 
   describe('getWidgets', () => {
     it('returns widgets from console', async () => {
-      const mockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {
-          [mockWidget.id]: mockWidget
-        },
-        providers: {},
-        dashboards: {}
-      });
+      const mockWidget = BasicWidget.fromJson(basicWidget);
+      const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
-      const result = await WidgetClient.getWidget('mock-console', 'mock-id');
+      const result = await WidgetClient.getWidget('mock-console', basicWidget.id);
 
       expect(result).toEqual(mockWidget);
     });
@@ -135,7 +136,7 @@ describe('widget client tests', () => {
 
       let thrownError;
       try {
-        await WidgetClient.getWidget('mock-console', 'mock-id');
+        await WidgetClient.getWidget('mock-console', basicWidget.id);
       } catch (error) {
         thrownError = error;
       } finally {
@@ -146,32 +147,14 @@ describe('widget client tests', () => {
   });
   describe('createWidget', () => {
     it('saves widget to console and returns saved widget', async () => {
-      const mockWidget = GenericWidget.fromJson({
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+      const mockWidget = BasicWidget.fromJson(basicWidget);
+      const mockConsole = await ConsoleParser.fromJson({
+        ...basicConsole,
+        dependencies: { ...basicConsoleWithWidget.dependencies }
       });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {},
-        providers: {},
-        dashboards: {}
-      });
-      const mockSavedConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {
-          'MockWidget': {
-            ...mockWidget,
-            id: 'MockWidget'
-          }
-        },
-        providers: {},
-        dashboards: {}
-      });
+      const mockSavedConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       mockGetConsole.mockResolvedValueOnce(mockSavedConsole);
-      jest.spyOn(WidgetClient, 'getWidget');
-
       const result = await WidgetClient.createWidget('mock-console', mockWidget);
 
       expect(mockGetConsole).toBeCalledTimes(2);
@@ -180,27 +163,14 @@ describe('widget client tests', () => {
       expect(WidgetClient.getWidget).toBeCalledTimes(1);
       expect(result).toEqual({
         ...mockWidget,
-        id: 'MockWidget'
+        id: mockWidget.id
       });
     });
-    it('throws Conflict if widget already exists on console', async () => {
-      const mockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {
-          [mockWidget.id]: mockWidget
-        },
-        providers: {},
-        dashboards: {}
-      });
-      mockGetConsole.mockResolvedValueOnce(mockConsole);
-      jest.spyOn(WidgetClient, 'getWidget');
 
+    it('throws Conflict if widget already exists on console', async () => {
+      const mockWidget = BasicWidget.fromJson(basicWidget);
+      const mockConsole = ConsoleParser.fromJson(basicConsoleWithWidget);
+      mockGetConsole.mockResolvedValueOnce(mockConsole);
       let thrownError;
       try {
         await WidgetClient.createWidget('mock-console', mockWidget);
@@ -220,39 +190,26 @@ describe('widget client tests', () => {
   });
   describe('updateWidget', () => {
     it('saves widget to console and returns saved widget', async () => {
-      const oldMockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
-      });
-      const oldMockConsole = Console.fromJson({
-        name: 'mock-console',
+      const oldMockWidget = BasicWidget.fromJson(basicWidget);
+      const oldMockConsole = await ConsoleParser.fromJson({
+        ...basicConsoleWithWidget,
         widgets: {
           [oldMockWidget.id]: oldMockWidget
-        },
-        providers: {},
-        dashboards: {}
+        }
       });
-      const newMockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget 2',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
+      const newMockWidget = BasicWidget.fromJson({
+        ...basicWidget,
+        displayName: 'Mock Widget 2'
       });
-      const newMockConsole = Console.fromJson({
-        name: 'mock-console',
+      const newMockConsole = await ConsoleParser.fromJson({
+        ...basicConsoleWithWidget,
         widgets: {
           [newMockWidget.id]: newMockWidget
-        },
-        providers: {},
-        dashboards: {}
+        }
       });
       mockGetConsole.mockResolvedValueOnce(oldMockConsole);
       mockGetConsole.mockResolvedValueOnce(newMockConsole);
-      jest.spyOn(WidgetClient, 'getWidget');
-
-      const result = await WidgetClient.updateWidget('mock-console', 'mock-id', newMockWidget);
+      const result = await WidgetClient.updateWidget('mock-console', basicWidget.id, newMockWidget);
 
       expect(mockGetConsole).toBeCalledTimes(2);
       expect(mockSaveConsole).toBeCalledTimes(1);
@@ -260,24 +217,12 @@ describe('widget client tests', () => {
       expect(result).toEqual(newMockWidget);
     });
     it('throws NotFound if widget does not exist on console', async () => {
-      const mockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {},
-        providers: {},
-        dashboards: {}
-      });
+      const mockWidget = BasicWidget.fromJson(basicWidget);
+      const mockConsole = await ConsoleParser.fromJson(basicConsole);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-      jest.spyOn(WidgetClient, 'getWidget');
-
       let thrownError;
       try {
-        await WidgetClient.updateWidget('mock-console', 'mock-id', mockWidget);
+        await WidgetClient.updateWidget('mock-console', basicWidget.id, mockWidget);
       } catch (error) {
         thrownError = error;
       } finally {
@@ -294,37 +239,19 @@ describe('widget client tests', () => {
   });
   describe('deleteWidget', () => {
     it('deletes widget from console and returns deleted widget', async () => {
-      const mockWidget = GenericWidget.fromJson({
-        id: 'mock-id',
-        displayName: 'Mock Widget',
-        type: 'MockWidget',
-        providerId: 'MockProvider'
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {
-          [mockWidget.id]: mockWidget
-        },
-        providers: {},
-        dashboards: {}
-      });
+      const mockWidget = BasicWidget.fromJson(basicWidget);
+      const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
-      const result = await WidgetClient.deleteWidget('mock-console', 'mock-id');
+      const result = await WidgetClient.deleteWidget('mock-console', basicWidget.id);
 
       expect(mockGetConsole).toBeCalledTimes(1);
       expect(mockSaveConsole).toBeCalledTimes(1);
       expect(result).toEqual(mockWidget);
     });
     it('throws NotFound if widget does not exist on console', async () => {
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        widgets: {},
-        providers: {},
-        dashboards: {}
-      });
+      const mockConsole = await ConsoleParser.fromJson(basicConsole);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-      jest.spyOn(WidgetClient, 'getWidget');
 
       let thrownError;
       try {

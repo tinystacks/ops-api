@@ -25,6 +25,6 @@ jobs:
         npm ci;
         npm run qa;
         npm run build;
-        node .github/workflows/dependency-check.js
+        node .github/workflows/dependency-check.cjs
       env:
         NODE_AUTH_TOKEN: ${{ secrets.TS_GH_BOT }}

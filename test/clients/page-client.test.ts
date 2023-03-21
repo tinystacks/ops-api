@@ -1,22 +1,42 @@
 const mockGetConsole = jest.fn();
 const mockSaveConsole = jest.fn();
 
-jest.mock('../../src/clients/console-client', () => ({
+jest.mock('../../src/clients/console-client/index.js', () => jest.fn().mockImplementation(() =>({
   getConsole: mockGetConsole,
   saveConsole: mockSaveConsole
-}));
+})));
 
-import Console from '../../src/classes/console';
-import Dashboard from '../../src/classes/dashboard';
+
 import DashboardClient from '../../src/clients/dashboard-client';
 import HttpError from 'http-errors';
+import { ConsoleParser, DashboardParser } from '@tinystacks/ops-core';
+import { Dashboard } from '@tinystacks/ops-model';
+import { Console } from '@tinystacks/ops-model';
+
+const mockSpyGetDashboard = jest.spyOn(DashboardClient, 'getDashboard');
+
+const basicDashboardJson: Dashboard = {
+  id: 'MockRoute',
+  route: '/mock-route',
+  widgetIds: []
+};
+
+const basicConsoleJson: Console = {
+  name: 'mock-console',
+  dashboards: {},
+  providers: {},
+  widgets: {},
+  dependencies: {}
+};
 
 describe('dashboard client tests', () => {
   afterEach(() => {
     // for mocks
-    jest.resetAllMocks();
+    mockGetConsole.mockReset();
+    mockSaveConsole.mockReset();
     // for spies
-    jest.restoreAllMocks();
+    mockSpyGetDashboard.mockRestore();
+    // jest.restoreAllMocks();
   });
   describe('handleError', () => {
     describe('reuses console client errors when possible', () => {
@@ -30,7 +50,7 @@ describe('dashboard client tests', () => {
         } finally {
           expect(thrownError).toBeDefined();
           expect(thrownError).toEqual(
-            HttpError.InternalServerError('Cannot fetch dashboards! No value was found for CONFIG_PATH!')
+            HttpError.InternalServerError('Cannot fetch dashboard! No value was found for CONFIG_PATH!')
           );
         }
       });
@@ -44,7 +64,7 @@ describe('dashboard client tests', () => {
         } finally {
           expect(thrownError).toBeDefined();
           expect(thrownError).toEqual(
-            HttpError.NotFound('Cannot fetch dashboards! Config file test.yml not found!')
+            HttpError.NotFound('Cannot fetch dashboard! Config file test.yml not found!')
           );
         }
       });
@@ -64,18 +84,10 @@ describe('dashboard client tests', () => {
   });
   describe('getDashboard', () => {
     it('returns dashboard from console matching the route specified', async () => {
-      const mockDashboard = Dashboard.fromJson({
-        id: 'MockRoute',
-        route: '/mock-route',
-        widgetIds: []
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        dashboards: {
-          MockRoute: mockDashboard
-        },
-        providers: {},
-        widgets: {}
+      const mockDashboard = DashboardParser.fromJson(basicDashboardJson);
+      const mockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson,
+        dashboards: { MockRoute: mockDashboard }
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
@@ -84,12 +96,7 @@ describe('dashboard client tests', () => {
       expect(result).toEqual(mockDashboard);
     });
     it('throws not found if dashboard does not exist on the console', async () => {
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        dashboards: {},
-        providers: {},
-        widgets: {}
-      });
+      const mockConsole = ConsoleParser.fromJson(basicConsoleJson);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
       let thrownError;
@@ -108,20 +115,12 @@ describe('dashboard client tests', () => {
 
   describe('getDashboards', () => {
     it('returns dashboards from console', async () => {
-      const mockDashboard = Dashboard.fromJson({
-        route: '/mock-route',
-        widgetIds: []
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        dashboards: {
-          MockRoute: mockDashboard
-        },
-        providers: {},
-        widgets: {}
+      const mockDashboard = DashboardParser.fromJson(basicDashboardJson);
+      const mockConsole = await ConsoleParser.fromJson({
+        ...basicConsoleJson,
+        dashboards: { MockRoute: mockDashboard }
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-
       const result = await DashboardClient.getDashboards('mock-console');
 
       expect(result).toEqual([mockDashboard]);
@@ -143,26 +142,20 @@ describe('dashboard client tests', () => {
   });
   describe('createDashboard', () => {
     it('saves dashboard to console and returns saved dashboard', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        dashboards: {},
-        providers: {},
-        widgets: {}
-      });
-      const mockSavedConsole = Console.fromJson({
-        name: 'mock-console',
+      } as Dashboard);
+      const mockConsole = await ConsoleParser.fromJson(basicConsoleJson);
+      const mockSavedConsole = await ConsoleParser.fromJson({
+        ...basicConsoleJson,
         dashboards: {
-          MockRoute: { 
+          'mock-dashboard': { 
             ...mockDashboard,
-            id: 'MockRoute'
+            id: 'mock-dashboard'
           }
-        },
-        providers: {},
-        widgets: {}
+        }
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       mockGetConsole.mockResolvedValueOnce(mockSavedConsole);
@@ -175,25 +168,25 @@ describe('dashboard client tests', () => {
       expect(mockSaveConsole).toBeCalledWith('mock-console', mockSavedConsole);
       expect(DashboardClient.getDashboard).toBeCalledTimes(1);
       expect(result).toEqual({
-        ...mockDashboard,
-        id: 'MockRoute'
+        ...mockDashboard
       });
+
+      mockGetConsole.mockReset();
+      mockSaveConsole.mockReset();
     });
     it('throws Conflict if dashboard with id already exists on console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
-      });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
+      } as Dashboard);
+      const mockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson,
         dashboards: {
-          MockRoute: mockDashboard
-        },
-        providers: {},
-        widgets: {}
-      });
+          'mock-dashboard': mockDashboard
+        }
+      } as Console);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-      jest.spyOn(DashboardClient, 'getDashboard');
 
       let thrownError;
       try {
@@ -203,29 +196,27 @@ describe('dashboard client tests', () => {
       } finally {
         expect(mockGetConsole).toBeCalledTimes(1);
         expect(mockSaveConsole).not.toBeCalled();
-        expect(DashboardClient.getDashboard).not.toBeCalled();
+        expect(mockSpyGetDashboard).not.toBeCalled();
 
         expect(thrownError).toBeDefined();
         expect(thrownError).toEqual(
-          HttpError.Conflict('Cannot create new dashboard with id MockRoute because a dashboard with this id already exists on console mock-console!')
+          HttpError.Conflict('Cannot create new dashboard with id mock-dashboard because a dashboard with this id already exists on console mock-console!')
         );
-      }
+      }      
     });
     it('throws Conflict if dashboard with route already exists on console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
+        id: 'mock-dashboard',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
+      const mockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson,
         dashboards: {
           MainDashboard: mockDashboard
-        },
-        providers: {},
-        widgets: {}
+        }
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-      jest.spyOn(DashboardClient, 'getDashboard');
 
       let thrownError;
       try {
@@ -235,7 +226,7 @@ describe('dashboard client tests', () => {
       } finally {
         expect(mockGetConsole).toBeCalledTimes(1);
         expect(mockSaveConsole).not.toBeCalled();
-        expect(DashboardClient.getDashboard).not.toBeCalled();
+        expect(mockSpyGetDashboard).not.toBeCalled();
 
         expect(thrownError).toBeDefined();
         expect(thrownError).toEqual(
@@ -244,33 +235,30 @@ describe('dashboard client tests', () => {
       }
     });
   });
+
   describe('updateDashboard', () => {
     it('saves dashboard to console and returns saved dashboard', async () => {
-      const oldMockDashboard = Dashboard.fromJson({
+      const oldMockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const oldMockConsole = Console.fromJson({
-        name: 'mock-console',
+      const oldMockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson,
         dashboards: {
           MockRoute: oldMockDashboard
-        },
-        providers: {},
-        widgets: {}
+        }
       });
-      const newMockDashboard = Dashboard.fromJson({
+      const newMockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
-        widgetIds: ['widget-1']
+        widgetIds: []
       }); 
-      const newMockConsole = Console.fromJson({
-        name: 'mock-console',
+      const newMockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson,
         dashboards: {
-          MockRoute: newMockDashboard
-        },
-        providers: {},
-        widgets: {}
+          MockRoute: newMockDashboard,
+        }
       });
       mockGetConsole.mockResolvedValueOnce(oldMockConsole);
       mockGetConsole.mockResolvedValueOnce(newMockConsole);
@@ -284,16 +272,13 @@ describe('dashboard client tests', () => {
       expect(result).toEqual(newMockDashboard);
     });
     it('throws NotFound if dashboard does not exist on console', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        dashboards: {},
-        providers: {},
-        widgets: {}
+      const mockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       jest.spyOn(DashboardClient, 'getDashboard');
@@ -315,20 +300,19 @@ describe('dashboard client tests', () => {
       }
     });
   });
+
   describe('deleteDashboard', () => {
     it('deletes dashboard from console and returns deleted dashboard', async () => {
-      const mockDashboard = Dashboard.fromJson({
+      const mockDashboard = DashboardParser.fromJson({
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
       });
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
+      const mockConsole = ConsoleParser.fromJson({
+        ...basicConsoleJson,
         dashboards: {
           MockRoute: mockDashboard
-        },
-        providers: {},
-        widgets: {}
+        }
       });
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
@@ -339,12 +323,7 @@ describe('dashboard client tests', () => {
       expect(result).toEqual(mockDashboard);
     });
     it('throws NotFound if dashboard does not exist on console', async () => {
-      const mockConsole = Console.fromJson({
-        name: 'mock-console',
-        dashboards: {},
-        providers: {},
-        widgets: {}
-      });
+      const mockConsole = ConsoleParser.fromJson(basicConsoleJson);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       jest.spyOn(DashboardClient, 'getDashboard');
 

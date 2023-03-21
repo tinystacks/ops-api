@@ -177,7 +177,7 @@ class S3ConsoleClient implements IConsoleClient {
        */
       const configFile = await this.getConfig();
       if (!configFile) throw HttpError.NotFound(`Cannot fetch console! Config file ${configPath} not found!`);
-      const configJson = (yaml.load(configFile.toString()) as any).Console as YamlConsole;
+      const configJson = (yaml.load(configFile.toString()) as any)?.Console as YamlConsole;
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
         const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
@@ -226,4 +226,7 @@ class S3ConsoleClient implements IConsoleClient {
   }
 }
 
+export {
+  S3ConsoleClient
+};
 export default S3ConsoleClient;

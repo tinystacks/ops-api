@@ -5,7 +5,7 @@ export default function () {
   return {
     async GET (request: Request, response: Response, next: NextFunction) {
       try {
-        const rawOverrides = request.query.overrides;
+        const rawOverrides = request.query?.overrides;
         let overrides: any = undefined;
         if (rawOverrides && typeof rawOverrides === 'string') {
           try {

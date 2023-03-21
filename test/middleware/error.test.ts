@@ -6,7 +6,7 @@ jest.mock('express');
 
 import { TinyStacksError as TinyStacksErrorType } from '@tinystacks/ops-model';
 import TinyStacksError from '../../src/errors/tinystacks-error';
-import { errorMiddleware } from '../../src/middleware';
+import errorMiddleware from '../../src/middleware/error';
 import { Request, Response } from 'express';
 import HttpError from 'http-errors';
 
@@ -49,7 +49,7 @@ describe('error middleware tests', () => {
       name: 'TinyStacksError',
       status: 418,
       message: 'mock-error',
-      type: 'Validation'
+      type: TinyStacksErrorType.type.VALIDATION
     });
 
     await errorMiddleware(mockError, mockRequest, mockResponse, mockNext);

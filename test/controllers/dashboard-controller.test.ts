@@ -3,7 +3,7 @@ const mockCreateDashboard = jest.fn();
 const mockUpdateDashboard = jest.fn();
 const mockDeleteDashboard = jest.fn();
 
-jest.mock('../../src/clients/dashboard-client.ts', () => ({
+jest.mock('../../src/clients/dashboard-client.js', () => ({
   getDashboards: mockGetDashboards,
   createDashboard: mockCreateDashboard,
   updateDashboard: mockUpdateDashboard,
@@ -11,7 +11,7 @@ jest.mock('../../src/clients/dashboard-client.ts', () => ({
 }));
 
 import { Dashboard } from '@tinystacks/ops-model';
-import DashboardController from '../../src/controllers/dashboard-controller';
+import DashboardController from '../../src/controllers/dashboard-controller.js';
 
 describe('dashboard controller tests', () => {
   afterEach(() => {
@@ -21,12 +21,15 @@ describe('dashboard controller tests', () => {
     jest.restoreAllMocks();
   });
   it('getDashboard', async () => {
+    mockGetDashboards.mockResolvedValueOnce([]);
     await DashboardController.getDashboards('mock-console');
     expect(mockGetDashboards).toBeCalled();
     expect(mockGetDashboards).toBeCalledWith('mock-console');
   });
   it('postDashboard', async () => {
+    mockCreateDashboard.mockResolvedValueOnce({ toJson: () => '' });
     const requestBody: Dashboard = {
+      id: 'mock-dashboard',
       route: '/mock-dashboard',
       widgetIds: []
     };
@@ -35,7 +38,9 @@ describe('dashboard controller tests', () => {
     expect(mockCreateDashboard).toBeCalledWith('mock-console', requestBody);
   });
   it('putDashboard', async () => {
+    mockUpdateDashboard.mockResolvedValueOnce({ toJson: () => '' });
     const requestBody: Dashboard = {
+      id: 'mock-dashboard',
       route: '/mock-dashboard',
       widgetIds: []
     };
@@ -47,6 +52,7 @@ describe('dashboard controller tests', () => {
     });
   });
   it('deleteDashboard', async () => {
+    mockDeleteDashboard.mockResolvedValueOnce({ toJson: () => '' });
     await DashboardController.deleteDashboard('mock-console', '/mock-dashboard');
     expect(mockDeleteDashboard).toBeCalled();
     expect(mockDeleteDashboard).toBeCalledWith('mock-console', '/mock-dashboard');

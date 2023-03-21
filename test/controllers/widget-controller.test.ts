@@ -21,17 +21,18 @@ describe('widget controller tests', () => {
     jest.restoreAllMocks();
   });
   it('getWidget', async () => {
+    mockGetWidget.mockResolvedValueOnce({ toJson: () => '' });
     await WidgetController.getWidget('mock-console', 'mock-widget');
     expect(mockGetWidget).toBeCalled();
-    expect(mockGetWidget).toBeCalledWith('mock-console', 'mock-widget');
+    expect(mockGetWidget).toBeCalledWith('mock-console', 'mock-widget', undefined);
   });
   it('postWidget', async () => {
     const requestBody: Widget = {
       id: 'mock-widget',
       displayName: 'Mock Widget',
-      type: 'mock-widget',
-      providerId: 'MockProvider'
+      type: 'mock-widget'
     };
+    mockCreateWidget.mockResolvedValueOnce({ toJson: () => '' });
     await WidgetController.postWidget('mock-console', requestBody);
     expect(mockCreateWidget).toBeCalled();
     expect(mockCreateWidget).toBeCalledWith('mock-console', requestBody);
@@ -40,9 +41,9 @@ describe('widget controller tests', () => {
     const requestBody: Widget = {
       id: 'mock-widget',
       displayName: 'Mock Widget',
-      type: 'mock-widget',
-      providerId: 'MockProvider'
+      type: 'mock-widget'
     };
+    mockUpdateWidget.mockResolvedValueOnce({ toJson: () => '' });
     await WidgetController.putWidget('mock-console', 'mock-widget-2', requestBody);
     expect(mockUpdateWidget).toBeCalled();
     expect(mockUpdateWidget).toBeCalledWith('mock-console', 'mock-widget-2', {
@@ -51,6 +52,7 @@ describe('widget controller tests', () => {
     });
   });
   it('deleteWidget', async () => {
+    mockDeleteWidget.mockResolvedValueOnce({ toJson: () => '' });
     await WidgetController.deleteWidget('mock-console', 'mock-widget');
     expect(mockDeleteWidget).toBeCalled();
     expect(mockDeleteWidget).toBeCalledWith('mock-console', 'mock-widget');
