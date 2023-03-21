@@ -71,6 +71,7 @@ export async function authenticationMiddleware (request: Request, response: Resp
     }
     next();
   } catch (e) {
+    console.error('Received and error in authentication middleware!', e);
     response.status(401).send(HttpError.Unauthorized('Authentication is required!'));
     return;
   }
