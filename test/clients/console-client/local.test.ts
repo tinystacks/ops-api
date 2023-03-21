@@ -28,30 +28,35 @@ import LocalConsoleClient from '../../../src/clients/console-client/local';
 import HttpError from 'http-errors';
 import { ConsoleParser } from '@tinystacks/ops-core';
 
-const basicConsoleJson: Console = {
-  name: 'mock-console',
+const mockConsoleName = 'mock-console';
+const mockConsoleJson: Console = {
+  name: mockConsoleName,
   dashboards: {},
   providers: {},
   widgets: {},
   dependencies: {}
 };
 
+const mockConfigYaml = `Console: name: ${mockConsoleName}`;
+
+let localConsoleClient: LocalConsoleClient;
 describe('local console client tests', () => {
   beforeEach(() => {
     delete process.env.CONFIG_PATH;
+    localConsoleClient = new LocalConsoleClient();
   });
   afterEach(() => {
     // for mocks
-    // jest.resetAllMocks();
+    jest.resetAllMocks();
 
     // for spies
-    // jest.restoreAllMocks();
+    jest.restoreAllMocks();
   });
-  describe('getLocalConsoles', () => {
+  describe('getConsole', () => {
     it('throws InternalServerError if CONFIG_PATH is not set', async () => {
       let thrownError;
       try {
-        await new LocalConsoleClient().getConsole();
+        await localConsoleClient.getConsole();
       } catch (error) {
         thrownError = error;
       } finally {
@@ -68,7 +73,7 @@ describe('local console client tests', () => {
       mockTryToReadFile.mockReturnValueOnce(undefined);
       let thrownError;
       try {
-        await new LocalConsoleClient().getConsole();
+        await localConsoleClient.getConsole();
       } catch (error) {
         thrownError = error;
       } finally {
@@ -82,7 +87,7 @@ describe('local console client tests', () => {
     });
     it('returns Console on success', async () => {
       const mockConfigPath = './mock.yml';
-      const mockConsole = { ...basicConsoleJson };
+      const mockConsole = { ...mockConsoleJson };
       process.env.CONFIG_PATH = mockConfigPath;
       mockResolve.mockReturnValueOnce(mockConfigPath);
       mockTryToReadFile.mockReturnValueOnce(Buffer.from('Console: '));
@@ -90,7 +95,7 @@ describe('local console client tests', () => {
         Console: mockConsole
       });
     
-      const result = await new LocalConsoleClient().getConsole();
+      const result = await localConsoleClient.getConsole();
     
       expect(mockResolve).toBeCalled();
       expect(mockResolve).toBeCalledWith(mockConfigPath);
@@ -108,7 +113,7 @@ describe('local console client tests', () => {
       mockLoad.mockReturnValueOnce(undefined);
       let thrownError;
       try {
-        await new LocalConsoleClient().getConsole();
+        await localConsoleClient.getConsole();
       } catch (error) {
         thrownError = error;
       } finally {
@@ -123,12 +128,31 @@ describe('local console client tests', () => {
       }
     });
   });
-  describe('saveLocalConsole', () => {
+  describe('getConsoles', () => {
+    it('returns array of console if one exists', async () => {
+      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
+
+      const result = await localConsoleClient.getConsoles();
+
+      expect(LocalConsoleClient.prototype.getConsole).toBeCalled();
+      expect(result).toEqual([mockConsole]);
+    });
+    it('returns empty array if console does not exist', async () => {
+      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValue(undefined);
+
+      const result = await localConsoleClient.getConsoles();
+
+      expect(LocalConsoleClient.prototype.getConsole).toBeCalled();
+      expect(result).toEqual([]);
+    });
+  });
+  describe('saveConsole', () => {
     it('throws InternalServerError if CONFIG_PATH is not set', async () => {
-      const mockConsole = await ConsoleParser.fromJson(basicConsoleJson);
+      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
       let thrownError;
       try {
-        await new LocalConsoleClient().getConsole(mockConsole.name);
+        await localConsoleClient.getConsole(mockConsole.name);
       } catch (error) {
         thrownError = error;
       } finally {
@@ -140,59 +164,55 @@ describe('local console client tests', () => {
     });
     it('writes to file and returns saved Console on success', async () => {
       const mockConfigPath = './mock.yml';
-      const mockConsole = await ConsoleParser.fromJson(basicConsoleJson);
+      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
 
       process.env.CONFIG_PATH = mockConfigPath;
       mockResolve.mockReturnValueOnce(mockConfigPath);
-      mockTryToReadFile.mockReturnValueOnce(Buffer.from('Console: '));
-      mockDump.mockReturnValueOnce('Console: ');
-      mockGetConsole.mockResolvedValueOnce(mockConsole);
+      mockDump.mockReturnValueOnce(mockConfigYaml);
+      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole)
     
-      const result = await new LocalConsoleClient().saveConsole('mock-console', mockConsole);
+      const result = await localConsoleClient.saveConsole('mock-console', mockConsole);
     
       expect(mockResolve).toBeCalled();
       expect(mockResolve).toBeCalledWith(mockConfigPath);
       expect(mockDump).toBeCalled();
-      // expect(mockDump).toBeCalledWith(mockConsole.toYaml());
+      expect(mockDump).toBeCalledWith({
+        Console: mockConsole.toYaml()
+      });
       expect(mockWriteFileSync).toBeCalled();
-      expect(mockWriteFileSync).toBeCalledWith(mockConfigPath, 'Console: ');
-      expect(mockGetConsole).toBeCalled();
+      expect(mockWriteFileSync).toBeCalledWith(mockConfigPath, mockConfigYaml);
+      expect(LocalConsoleClient.prototype.getConsole).toBeCalled();
       expect(result).toEqual(mockConsole);
     });
-    // it('logs and re-throws errors', async () => {
-    //   const mockConfigPath = './mock.yml';
-    //   const mockConsole = await ConsoleParser.fromJson({
-    //     name: 'mock-console',
-    //     dashboards: {},
-    //     providers: {},
-    //     widgets: {}
-    //   });
-    //   const mockError = new Error();
-    //   process.env.CONFIG_PATH = mockConfigPath;
-    //   mockWriteFileSync.mockImplementationOnce(() => { throw mockError; });
-    //   jest.spyOn(global.console, 'error').mockImplementationOnce(jest.fn());
+    it('logs and re-throws errors', async () => {
+      const mockConfigPath = './mock.yml';
+      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockError = new Error();
+      process.env.CONFIG_PATH = mockConfigPath;
+      mockWriteFileSync.mockImplementationOnce(() => { throw mockError; });
+      jest.spyOn(global.console, 'error').mockImplementationOnce(jest.fn());
 
-    //   let thrownError;
-    //   try {
-    //     await new LocalConsoleClient().saveConsole('mock-console', mockConsole);
-    //   } catch (error) {
-    //     thrownError = error;
-    //   } finally {
-    //     expect(mockDump).toBeCalled();
-    //     expect(mockWriteFileSync).toBeCalled();
-    //     expect(mockGetConsole).not.toBeCalled();
-    //     expect(global.console.error).toBeCalled();
-    //     expect(global.console.error).toBeCalledWith('Failed to save local console mock-console!', mockError);
-    //     expect(thrownError).toBeDefined();
-    //     expect(thrownError).toEqual(mockError);
-    //   }
-    // });
+      let thrownError;
+      try {
+        await localConsoleClient.saveConsole('mock-console', mockConsole);
+      } catch (error) {
+        thrownError = error;
+      } finally {
+        expect(mockDump).toBeCalled();
+        expect(mockWriteFileSync).toBeCalled();
+        expect(mockGetConsole).not.toBeCalled();
+        expect(global.console.error).toBeCalled();
+        expect(global.console.error).toBeCalledWith('Failed to save local console mock-console!', mockError);
+        expect(thrownError).toBeDefined();
+        expect(thrownError).toEqual(mockError);
+      }
+    });
   });
-  describe('deleteLocalConsole', () => {
+  describe('deleteConsole', () => {
     it('throws InternalServerError if CONFIG_PATH is not set', async () => {
       let thrownError;
       try {
-        await new LocalConsoleClient().deleteConsole('mock-console');
+        await localConsoleClient.deleteConsole('mock-console');
       } catch (error) {
         thrownError = error;
       } finally {
@@ -202,54 +222,44 @@ describe('local console client tests', () => {
         expect(thrownError).toEqual(HttpError.InternalServerError('Cannot delete console mock-console! No value was found for CONFIG_PATH!'));
       }
     });
-    // it('overwrites config file with empty string and returns previous Console state on success', async () => {
-    //   const mockConfigPath = './mock.yml';
-    //   const mockConsole = ConsoleParser.fromJson({
-    //     name: 'mock-console',
-    //     dashboards: {},
-    //     providers: {},
-    //     widgets: {}
-    //   });
-    //   process.env.CONFIG_PATH = mockConfigPath;
-    //   mockResolve.mockReturnValueOnce(mockConfigPath);
-    //   jest.spyOn(LocalConsoleClient, 'getLocalConsole').mockResolvedValueOnce(mockConsole);
+    it('overwrites config file with empty string and returns previous Console state on success', async () => {
+      const mockConfigPath = './mock.yml';
+      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      process.env.CONFIG_PATH = mockConfigPath;
+      mockResolve.mockReturnValueOnce(mockConfigPath);
+      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
     
-    //   const result = await new LocalConsoleClient().deleteConsole('mock-console');
+      const result = await localConsoleClient.deleteConsole('mock-console');
     
-    //   expect(LocalConsoleClient.getConsole).toBeCalled();
-    //   expect(mockResolve).toBeCalled();
-    //   expect(mockResolve).toBeCalledWith(mockConfigPath);
-    //   expect(mockWriteFileSync).toBeCalled();
-    //   expect(mockWriteFileSync).toBeCalledWith(mockConfigPath, '');
-    //   expect(result).toEqual(mockConsole);
-    // });
-    // it('logs and re-throws errors', async () => {
-    //   const mockConfigPath = './mock.yml';
-    //   const mockConsole = ConsoleParser.fromJson({
-    //     name: 'mock-console',
-    //     dashboards: {},
-    //     providers: {},
-    //     widgets: {}
-    //   });
-    //   const mockError = new Error();
-    //   process.env.CONFIG_PATH = mockConfigPath;
-    //   mockWriteFileSync.mockImplementationOnce(() => { throw mockError; });
-    //   jest.spyOn(LocalConsoleClient, 'getConsole').mockResolvedValueOnce(mockConsole);
-    //   jest.spyOn(global.console, 'error').mockImplementationOnce(jest.fn());
+      expect(LocalConsoleClient.prototype.getConsole).toBeCalled();
+      expect(mockResolve).toBeCalled();
+      expect(mockResolve).toBeCalledWith(mockConfigPath);
+      expect(mockWriteFileSync).toBeCalled();
+      expect(mockWriteFileSync).toBeCalledWith(mockConfigPath, '');
+      expect(result).toEqual(mockConsole);
+    });
+    it('logs and re-throws errors', async () => {
+      const mockConfigPath = './mock.yml';
+      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockError = new Error();
+      process.env.CONFIG_PATH = mockConfigPath;
+      mockWriteFileSync.mockImplementationOnce(() => { throw mockError; });
+      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
+      jest.spyOn(global.console, 'error').mockImplementationOnce(jest.fn());
 
-    //   let thrownError;
-    //   try {
-    //     await new LocalConsoleClient().deleteConsole('mock-console');
-    //   } catch (error) {
-    //     thrownError = error;
-    //   } finally {
-    //     expect(new LocalConsoleClient().getConsole).toBeCalled();
-    //     expect(mockWriteFileSync).toBeCalled();
-    //     expect(global.console.error).toBeCalled();
-    //     expect(global.console.error).toBeCalledWith('Failed to delete local console mock-console!', mockError);
-    //     expect(thrownError).toBeDefined();
-    //     expect(thrownError).toEqual(mockError);
-    //   }
-    // });
+      let thrownError;
+      try {
+        await localConsoleClient.deleteConsole('mock-console');
+      } catch (error) {
+        thrownError = error;
+      } finally {
+        expect(localConsoleClient.getConsole).toBeCalled();
+        expect(mockWriteFileSync).toBeCalled();
+        expect(global.console.error).toBeCalled();
+        expect(global.console.error).toBeCalledWith('Failed to delete local console mock-console!', mockError);
+        expect(thrownError).toBeDefined();
+        expect(thrownError).toEqual(mockError);
+      }
+    });
   });
 });

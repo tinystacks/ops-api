@@ -55,7 +55,7 @@ class LocalConsoleClient implements IConsoleClient {
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot delete console ${consoleName}! No value was found for CONFIG_PATH!`);
     try {
-      const console = this.getConsole();
+      const console = await this.getConsole();
       writeFileSync(resolvePath(configPath), '');
       return console;
     } catch (error) {

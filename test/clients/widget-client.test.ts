@@ -1,6 +1,8 @@
 const mockGetConsole = jest.fn();
 const mockSaveConsole = jest.fn();
+const mockConsoleClient = jest.fn();
 
+jest.mock('../../src/clients/console-client/index.js', () => mockConsoleClient);
 
 import WidgetClient from '../../src/clients/widget-client.js';
 import HttpError from 'http-errors';
@@ -31,20 +33,21 @@ const basicConsoleWithWidget: Console = {
   }
 };
 
-const getWidgetWidgetClientSpy = jest.spyOn(WidgetClient, 'getWidget');
-jest.mock('../../src/clients/console-client/local.js', () => jest.fn().mockImplementation(() => ({
-  getConsole: mockGetConsole,
-  saveConsole: mockSaveConsole
-})));
-
 describe('widget client tests', () => {
+  beforeEach(() => {
+    jest.spyOn(WidgetClient, 'getWidget');
+    
+    mockConsoleClient.mockReturnValue({
+      getConsole: mockGetConsole,
+      saveConsole: mockSaveConsole
+    });
+  });
   afterEach(() => {
     // for mocks
-    mockGetConsole.mockReset();
-    mockSaveConsole.mockReset();
+    jest.resetAllMocks();
 
     // for spies
-    getWidgetWidgetClientSpy.mockClear();
+    jest.restoreAllMocks();
   });
   describe('handleError', () => {
     describe('reuses console client errors when possible', () => {
@@ -157,7 +160,7 @@ describe('widget client tests', () => {
       expect(mockGetConsole).toBeCalledTimes(2);
       expect(mockSaveConsole).toBeCalledTimes(1);
       expect(mockSaveConsole).toBeCalledWith('mock-console', mockSavedConsole);
-      expect(getWidgetWidgetClientSpy).toBeCalledTimes(1);
+      expect(WidgetClient.getWidget).toBeCalledTimes(1);
       expect(result).toEqual({
         ...mockWidget,
         id: mockWidget.id
@@ -176,7 +179,7 @@ describe('widget client tests', () => {
       } finally {
         expect(mockGetConsole).toBeCalledTimes(1);
         expect(mockSaveConsole).not.toBeCalled();
-        expect(getWidgetWidgetClientSpy).not.toBeCalled();
+        expect(WidgetClient.getWidget).not.toBeCalled();
 
         expect(thrownError).toBeDefined();
         expect(thrownError).toEqual(
@@ -210,7 +213,7 @@ describe('widget client tests', () => {
 
       expect(mockGetConsole).toBeCalledTimes(2);
       expect(mockSaveConsole).toBeCalledTimes(1);
-      expect(getWidgetWidgetClientSpy).toBeCalledTimes(1);
+      expect(WidgetClient.getWidget).toBeCalledTimes(1);
       expect(result).toEqual(newMockWidget);
     });
     it('throws NotFound if widget does not exist on console', async () => {
@@ -225,7 +228,7 @@ describe('widget client tests', () => {
       } finally {
         expect(mockGetConsole).toBeCalledTimes(1);
         expect(mockSaveConsole).not.toBeCalled();
-        expect(getWidgetWidgetClientSpy).not.toBeCalled();
+        expect(WidgetClient.getWidget).not.toBeCalled();
 
         expect(thrownError).toBeDefined();
         expect(thrownError).toEqual(
@@ -258,7 +261,7 @@ describe('widget client tests', () => {
       } finally {
         expect(mockGetConsole).toBeCalledTimes(1);
         expect(mockSaveConsole).not.toBeCalled();
-        expect(getWidgetWidgetClientSpy).not.toBeCalled();
+        expect(WidgetClient.getWidget).not.toBeCalled();
 
         expect(thrownError).toBeDefined();
         expect(thrownError).toEqual(
