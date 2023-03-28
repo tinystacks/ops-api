@@ -7,6 +7,7 @@ if [ ! -f "store/example.yml" ];
     cp basicexample.yml store/example.yml;
 fi
 
+depDir=$(bash ./install-runtime-dependencies.sh);
 
 # Build and run API
 NPM_TOKEN=$(cat ~/.npmrc | grep '^//npm.pkg.github.com' | cut -d "=" -f2-);
@@ -29,8 +30,10 @@ docker container rm $appName || true
 docker run --name $appName \
   -v $HOME/.aws:/root/.aws \
   -v $(pwd)/store:/config \
+  -v $depDir:/dependencies \
   --env CONFIG_PATH="../config/example.yml" \
   --env NODE_ENV=dev \
+  --env MOUNTED_DEPENDENCIES=true \
   -it \
   -p 8000:8000 \
   --network=ops-console \

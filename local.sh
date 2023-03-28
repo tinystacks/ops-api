@@ -10,6 +10,8 @@ if [ ! -f "store/example.yml" ];
     cp basicexample.yml store/example.yml;
 fi
 
+depDir=$(bash ./install-runtime-dependencies.sh);
+
 # Build and run API
 npm run build;
-CONFIG_PATH="./store/example.yml" NODE_ENV=dev node ./dist/server.js
+CONFIG_PATH="./store/example.yml" MOUNTED_DEPENDENCIES=true NODE_ENV=dev node ./dist/server.js
