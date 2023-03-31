@@ -24,3 +24,9 @@ To run in docker:
 ```bash
 npm run dev
 ```
+
+Install peer dependencies:
+```
+brew install yq
+brew install jq
+```

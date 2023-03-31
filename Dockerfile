@@ -10,6 +10,8 @@ ENV CONFIG_PATH=${CONFIG_PATH}
 ENV PORT=8000
 ARG ARCH
 ENV ARCH=${ARCH}
+ARG DEPENDENCIES
+ENV DEPENDENCIES=${DEPENDENCIES}
 
 WORKDIR /config
 
@@ -24,10 +26,11 @@ RUN chmod +x ./install-cli-tools.sh
 RUN bash ./install-cli-tools.sh
 
 # BUILD
+RUN if [ ! -z "${DEPENDENCIES}" ]; then npm i $DEPENDENCIES;  fi;
 RUN npm run clean-build
 RUN rm -rf ./src
 RUN npm prune --production
 
 
 EXPOSE 8000
-CMD ["node", "./dist/server.js"]
+CMD ["node", "--experimental-import-meta-resolve", "./dist/server.js"]

@@ -7,6 +7,7 @@ if [ ! -f "store/example.yml" ];
     cp basicexample.yml store/example.yml;
 fi
 
+dependencies=$(bash ./get-runtime-dependencies.sh);
 
 # Build and run API
 NPM_TOKEN=$(cat ~/.npmrc | grep '^//npm.pkg.github.com' | cut -d "=" -f2-);
@@ -23,6 +24,7 @@ docker build \
   --progress plain \
   --build-arg NPM_TOKEN=${NPM_TOKEN} \
   --build-arg ARCH=${ARCH} \
+  --build-arg DEPENDENCIES=${dependencies} \
   -t "$appName:$version" . || exit 1;
 docker container stop $appName || true
 docker container rm $appName || true
