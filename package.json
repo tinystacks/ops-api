@@ -21,7 +21,7 @@
     "local": "bash ./local.sh",
     "local-s3": "npm run clean-build; AWS_PROFILE=ts AWS_REGION=us-west-2 CONFIG_PATH=s3://ops-stacks-dev-config-storage-bucket-us-west-2/group:tinystacks-beta/layout-sample.yml NODE_ENV=dev node ./dist/server.js",
     "qa": "npm run lint && npm run test-cov",
-    "setup-test-lint": "node ./scripts/setup-test-lint.js",
+    "setup-test-lint": "node ./scripts/setup-test-lint.cjs",
     "staging": "bash ./staging.sh",
     "start": "node ./dist/server.js",
     "test": "jest",

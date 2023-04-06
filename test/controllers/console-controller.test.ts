@@ -24,13 +24,13 @@ describe('console controller tests', () => {
     expect(mockGetConsoles).toBeCalled();
   });
   it('postConsole', async () => {
-    mockSaveConsole.mockResolvedValueOnce({ toJson: () => {}});
+    mockSaveConsole.mockResolvedValueOnce({ toJson: () => {} });
     await ConsoleController.postConsole(requestBody);
     expect(mockSaveConsole).toBeCalled();
     expect(mockSaveConsole).toBeCalledWith(requestBody.name, requestBody);
   });
   it('putConsole', async () => {
-    mockSaveConsole.mockResolvedValueOnce({ toJson: () => {}});
+    mockSaveConsole.mockResolvedValueOnce({ toJson: () => {} });
     await ConsoleController.putConsole('mock-console', {
       ...requestBody,
       name: 'mock-console-2'
@@ -42,7 +42,7 @@ describe('console controller tests', () => {
     });
   });
   it('deleteConsole', async () => {
-    mockDeleteConsole.mockResolvedValueOnce({ toJson: () => {}});
+    mockDeleteConsole.mockResolvedValueOnce({ toJson: () => {} });
     await ConsoleController.deleteConsole('mock-console');
     expect(mockDeleteConsole).toBeCalled();
     expect(mockDeleteConsole).toBeCalledWith('mock-console');

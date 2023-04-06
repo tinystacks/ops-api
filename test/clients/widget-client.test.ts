@@ -36,7 +36,7 @@ const basicConsoleWithWidget: Console = {
 describe('widget client tests', () => {
   beforeEach(() => {
     jest.spyOn(WidgetClient, 'getWidget');
-    
+
     mockConsoleClient.mockReturnValue({
       getConsole: mockGetConsole,
       saveConsole: mockSaveConsole

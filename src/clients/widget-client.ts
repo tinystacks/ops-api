@@ -124,7 +124,7 @@ const WidgetClient = {
     property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>,
     referencedWidgets: Record<string, Widget>
   ): Promise<any> {
-    if (typeof(property) === 'object') {
+    if (typeof property === 'object') {
       // TODO: Sort out this ref tracing in core
       // TODO: Cycle detection (also in core)
       if (Array.isArray(property)) {
@@ -132,8 +132,7 @@ const WidgetClient = {
           property[i] = await this.resolveWidgetPropertyReferences(property[i], widgets, providers, referencedWidgets);
         }
         return property;
-      }
-      else if ('$ref' in property) {
+      } else if ('$ref' in property) {
         return await this.resolveWidgetPropertyReference(property, widgets, providers, referencedWidgets);
       } else {
         for (const p in property) {

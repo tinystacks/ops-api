@@ -151,7 +151,7 @@ describe('dashboard client tests', () => {
       const mockSavedConsole = await ConsoleParser.fromJson({
         ...basicConsoleJson,
         dashboards: {
-          'mock-dashboard': { 
+          'mock-dashboard': {
             ...mockDashboard,
             id: 'mock-dashboard'
           }
@@ -202,7 +202,7 @@ describe('dashboard client tests', () => {
         expect(thrownError).toEqual(
           HttpError.Conflict('Cannot create new dashboard with id mock-dashboard because a dashboard with this id already exists on console mock-console!')
         );
-      }      
+      }
     });
     it('throws Conflict if dashboard with route already exists on console', async () => {
       const mockDashboard = DashboardParser.fromJson({
@@ -253,11 +253,11 @@ describe('dashboard client tests', () => {
         id: 'MockRoute',
         route: '/mock-route',
         widgetIds: []
-      }); 
+      });
       const newMockConsole = ConsoleParser.fromJson({
         ...basicConsoleJson,
         dashboards: {
-          MockRoute: newMockDashboard,
+          MockRoute: newMockDashboard
         }
       });
       mockGetConsole.mockResolvedValueOnce(oldMockConsole);
