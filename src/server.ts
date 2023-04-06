@@ -49,15 +49,15 @@ async function startServer () {
   if (!CONFIG_PATH) {
     console.warn('No config path specified! API results may be empty.');
   }
-  
+
   const PORT = process.env.PORT || 8000;
-  
+
   console.debug('Setting up express and middleware.');
   const app: Application = express();
   app.use(json());
   app.use(unless(['/', '/ping', '/docs', '/docs/*'], authenticationMiddleware));
   app.use(cors());
-  
+
   console.debug('Constructing the swagger docs and open api spec.');
   const rootDocLocation = require.resolve('@tinystacks/ops-model/src/index.yml');
   console.debug('rootDocLocation: ', rootDocLocation);
@@ -70,7 +70,7 @@ async function startServer () {
       }
     }
   });
-  
+
   console.debug('Initializing express-openapi');
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -81,28 +81,28 @@ async function startServer () {
     promiseMode: true,
     errorMiddleware
   });
-  
+
   console.debug('Setting /docs route.');
   app.use(
     '/docs',
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec.resolved)
   );
-  
+
   console.debug('Setting / route.');
   app.get('/', (_request: Request, response: Response) => {
     const responseBody = 'Hello world from ops-console-api!';
     response.status(200).send(responseBody);
   });
-  
+
   console.debug('Setting error middleware.');
   app.use(errorMiddleware);
-  
+
   console.debug('Listenting to port.');
   const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
   });
-  
+
   process.on('SIGINT', () => {
     console.log('Received SIGINT. Exiting gracefully...');
     shutdown(server);

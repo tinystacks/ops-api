@@ -1,21 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import WidgetController from '../../../../controllers/widget-controller.js';
+import { parseObjectTypeQueryParam } from '../../../../utils/parsing-utils.js';
 
 export default function () {
   return {
     async GET (request: Request, response: Response, next: NextFunction) {
       try {
-        const rawOverrides = request.query?.overrides;
-        let overrides: any = undefined;
-        if (rawOverrides && typeof rawOverrides === 'string') {
-          try {
-            overrides = JSON.parse(rawOverrides);
-          } catch (e) {
-            console.error('non-stringified overrides');
-            console.error(e);
-          }
-        } 
-        const widget = await WidgetController.getWidget(request.params.consoleName, request.params.widgetId, overrides);
+        global.console.debug('GET widget route - request.query: ', request.query);
+        const overrides = parseObjectTypeQueryParam('overrides', request.query);
+        const dashboardId = request.query?.dashboardId as string;
+        const parameters = parseObjectTypeQueryParam('parameters', request.query);
+        const {
+          consoleName,
+          widgetId
+        } = request.params || {};
+        const widget = await WidgetController.getWidget({
+          consoleName,
+          widgetId,
+          overrides,
+          dashboardId,
+          parameters
+        });
         response.status(200).send(widget);
       } catch (error) {
         next(error);

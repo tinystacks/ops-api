@@ -6,6 +6,8 @@ import camelCase from 'lodash.camelcase';
 import get from 'lodash.get';
 import { Widget } from '@tinystacks/ops-model';
 import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
+import { GetWidgetArguments, HydrateWidgetReferencesArguments } from '../types/index.js';
+import { castParametersToDeclaredTypes } from '../utils/parsing-utils.js';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -17,13 +19,30 @@ const WidgetClient = {
     }
     throw error;
   },
-  async getWidget (consoleName: string, widgetId: string, overrides?: any): Promise<BaseWidget> {
+  async getWidget (args: GetWidgetArguments): Promise<BaseWidget> {
     try {
+      const {
+        consoleName,
+        widgetId,
+        overrides,
+        dashboardId,
+        parameters = {}
+      } = args;
+      global.console.debug('WidgetClient.getWidget - parameters: ', parameters);
+      global.console.debug('WidgetClient.getWidget - dashboardId: ', dashboardId);
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      return await this.hydrateWidgetReferences(widget, console.widgets, console.providers, overrides);
+      const { widgets, providers, dashboards = {} } = console;
+      const typeCastParameters = castParametersToDeclaredTypes(widgetId, parameters, dashboards, dashboardId);
+      return await this.hydrateWidgetReferences({
+        widget,
+        widgets,
+        providers,
+        overrides,
+        parameters: typeCastParameters
+      });
     } catch (error) {
       return this.handleError(error);
     }
@@ -42,7 +61,7 @@ const WidgetClient = {
       const newWidget = widgetInstance.toJson();
       await console.addWidget(newWidget, widgetId);
       await consoleClient.saveConsole(consoleName, console);
-      return this.getWidget(consoleName, widget.id);
+      return this.getWidget({ consoleName, widgetId: widget.id });
     } catch (error) {
       return this.handleError(error);
     }
@@ -61,7 +80,7 @@ const WidgetClient = {
       const updatedWidget = widgetInstance.toJson();
       await console.updateWidget(updatedWidget, widgetId);
       await consoleClient.saveConsole(console.name, console);
-      return this.getWidget(consoleName, widget.id);
+      return this.getWidget({ consoleName, widgetId: widget.id });
     } catch (error) {
       return this.handleError(error);
     }
@@ -83,19 +102,26 @@ const WidgetClient = {
   //   recursively for every ref:
   //      recA
   //      resolve ref by calling getData
-  async hydrateWidgetReferences (widget: any, consoleWidgets: Record<string, BaseWidget>, consoleProviders: Record<string, BaseProvider>,  overrides?: any) {
+  async hydrateWidgetReferences (args: HydrateWidgetReferencesArguments) {
+    const {
+      widget,
+      widgets,
+      providers,
+      overrides,
+      parameters
+    } = args;
     const referencedWidgets: Record<string, Widget> = {};
-    const resolvedWidget = await this.resolveWidgetPropertyReferences(widget, consoleWidgets, consoleProviders, referencedWidgets);
+    const resolvedWidget = await this.resolveWidgetPropertyReferences(widget, widgets, providers, referencedWidgets);
 
 
     const hydratedProviders = ((resolvedWidget as Widget).providerIds || []).map((providerId: string) => {
-      return consoleProviders[providerId];
+      return providers[providerId];
     });
-    await widget.getData(hydratedProviders,  overrides);
+    await widget.getData(hydratedProviders, overrides, parameters);
     return widget;
   },
   async resolveWidgetPropertyReferences (
-    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>, 
+    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>,
     referencedWidgets: Record<string, Widget>
   ): Promise<any> {
     if (typeof(property) === 'object') {
@@ -119,13 +145,17 @@ const WidgetClient = {
     return property;
   },
   async resolveWidgetPropertyReference (
-    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>, 
+    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>,
     referencedWidgets: Record<string, Widget>
   ) {
     const widgetId = property.$ref.split('/')[3];
     const refWidget = widgets[widgetId];
     if (!referencedWidgets[refWidget.id]) {
-      referencedWidgets[refWidget.id] = await this.hydrateWidgetReferences(refWidget, widgets, providers);
+      referencedWidgets[refWidget.id] = await this.hydrateWidgetReferences({
+        widget: refWidget,
+        widgets,
+        providers
+      });
     }
     const fullRefWidget = referencedWidgets[refWidget.id];
     return ('path' in property) ? get(fullRefWidget, property.path) : fullRefWidget;

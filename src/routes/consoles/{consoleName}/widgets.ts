@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import WidgetController from '../../../controllers/widget-controller.js';
 
 export default function () {
-  return {    
+  return {
     async POST (request: Request, response: Response, next: NextFunction) {
       try {
         const widget = await WidgetController.postWidget(request.params.consoleName, request.body);

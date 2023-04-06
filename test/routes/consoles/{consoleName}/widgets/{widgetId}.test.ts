@@ -49,7 +49,10 @@ describe('/widgets/{widgetId} tests', () => {
       await WidgetRoutes().GET(mockRequest, mockResponse, mockNext);
 
       expect(mockGetWidget).toBeCalled();
-      expect(mockGetWidget).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.widgetId, undefined);
+      expect(mockGetWidget).toBeCalledWith({
+        consoleName: mockRequestParams.consoleName,
+        widgetId: mockRequestParams.widgetId
+      });
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(200);
       expect(mockSend).toBeCalled();
@@ -63,7 +66,10 @@ describe('/widgets/{widgetId} tests', () => {
       await WidgetRoutes().GET(mockRequest, mockResponse, mockNext);
 
       expect(mockGetWidget).toBeCalled();
-      expect(mockGetWidget).toBeCalledWith(mockRequestParams.consoleName, mockRequestParams.widgetId, undefined);
+      expect(mockGetWidget).toBeCalledWith({
+        consoleName: mockRequestParams.consoleName,
+        widgetId: mockRequestParams.widgetId
+      });
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
       expect(mockNext).toBeCalled();

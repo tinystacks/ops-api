@@ -1,9 +1,10 @@
 import { Widget } from '@tinystacks/ops-model';
 import WidgetClient from '../clients/widget-client.js';
+import { GetWidgetArguments } from '../types/index.js';
 
 const WidgetController = {
-  async getWidget (consoleName: string, widgetId: string, overrides?: any): Promise<Widget> {
-    return (await WidgetClient.getWidget(consoleName, widgetId, overrides)).toJson();
+  async getWidget (args: GetWidgetArguments): Promise<Widget> {
+    return (await WidgetClient.getWidget(args)).toJson();
   },
   async postWidget (consoleName: string, createWidgetBody: Widget): Promise<Widget> {
     return (await WidgetClient.createWidget(consoleName, createWidgetBody)).toJson();

@@ -54,7 +54,7 @@ async function validateApiKey (request: Request) {
     console.warn('No API_KEY_ID is set! All requests will fail with 401s!');
     throw HttpError.Unauthorized();
   }
-  
+
   const apiKeySecret = await cache.getOrElse(apiKeyId, fetchApiKey);
 
   if (apiKeySecret !== authHeader) {

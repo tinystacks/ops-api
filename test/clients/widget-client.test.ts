@@ -98,7 +98,10 @@ describe('widget client tests', () => {
       const mockWidget = basicWidget;
       const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-      const result = await WidgetClient.getWidget(basicConsoleWithWidget.name, basicWidget.id);
+      const result = await WidgetClient.getWidget({
+        consoleName: basicConsoleWithWidget.name,
+        widgetId: basicWidget.id
+      });
 
       expect(result).toEqual(mockWidget);
     });
@@ -108,7 +111,10 @@ describe('widget client tests', () => {
 
       let thrownError;
       try {
-        await WidgetClient.getWidget('mock-console', basicWidget.id);
+        await WidgetClient.getWidget({
+          consoleName: 'mock-console',
+          widgetId: basicWidget.id
+        });
       } catch (error) {
         thrownError = error;
       } finally {
@@ -126,7 +132,10 @@ describe('widget client tests', () => {
       const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
-      const result = await WidgetClient.getWidget('mock-console', basicWidget.id);
+      const result = await WidgetClient.getWidget({
+        consoleName: 'mock-console',
+        widgetId: basicWidget.id
+      });
 
       expect(result).toEqual(mockWidget);
     });
@@ -136,7 +145,10 @@ describe('widget client tests', () => {
 
       let thrownError;
       try {
-        await WidgetClient.getWidget('mock-console', basicWidget.id);
+        await WidgetClient.getWidget({
+          consoleName: 'mock-console',
+          widgetId: basicWidget.id
+        });
       } catch (error) {
         thrownError = error;
       } finally {

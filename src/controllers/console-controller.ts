@@ -6,9 +6,9 @@ const ConsoleController = {
   async getConsoles (): Promise<ConsoleType[]> {
     const consoleClient = new ConsoleClient();
     const consoles: ConsoleParser[] = await consoleClient.getConsoles();
-    const consoleTypes: ConsoleType[] = consoles.map( (console) => { 
+    const consoleTypes: ConsoleType[] = consoles.map( (console) => {
       return console.toJson();
-    }); 
+    });
     return consoleTypes;
   },
   async postConsole (createConsoleBody: ConsoleType): Promise<ConsoleType> {

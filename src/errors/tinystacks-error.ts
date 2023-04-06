@@ -40,7 +40,7 @@ class TinyStacksError implements TinyStacksErrorType {
       errorType
     );
   }
-  
+
   static isTinyStacksError (error: unknown): boolean {
     const e = error as any;
     const hasTinyStacksErrorName: boolean = e?.name && e?.name === TinyStacksError.TinyStacksErrorName;
