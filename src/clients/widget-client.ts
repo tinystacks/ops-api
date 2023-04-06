@@ -6,7 +6,11 @@ import camelCase from 'lodash.camelcase';
 import get from 'lodash.get';
 import { Widget } from '@tinystacks/ops-model';
 import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
-import { GetWidgetArguments, HydrateWidgetReferencesArguments } from '../types/index.js';
+import {
+  GetWidgetArguments,
+  HydrateWidgetReferencesArguments,
+  ResolveWidgetPropertyReferencesArguments
+} from '../types/index.js';
 import { castParametersToDeclaredTypes } from '../utils/parsing-utils.js';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
@@ -111,7 +115,13 @@ const WidgetClient = {
       parameters
     } = args;
     const referencedWidgets: Record<string, Widget> = {};
-    const resolvedWidget = await this.resolveWidgetPropertyReferences(widget, widgets, providers, referencedWidgets);
+    const resolvedWidget = await this.resolveWidgetPropertyReferences({
+      property: widget,
+      widgets,
+      providers,
+      referencedWidgets,
+      parameters
+    });
 
 
     const hydratedProviders = ((resolvedWidget as Widget).providerIds || []).map((providerId: string) => {
@@ -121,23 +131,59 @@ const WidgetClient = {
     return widget;
   },
   async resolveWidgetPropertyReferences (
-    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>,
-    referencedWidgets: Record<string, Widget>
+    args: ResolveWidgetPropertyReferencesArguments
   ): Promise<any> {
+    const {
+      property,
+      widgets,
+      providers,
+      referencedWidgets,
+      parameters = {}
+    } = args;
+    const parameterPrefix = '$param.';
     if (typeof property === 'object') {
       // TODO: Sort out this ref tracing in core
       // TODO: Cycle detection (also in core)
       if (Array.isArray(property)) {
         for (const i in property) {
-          property[i] = await this.resolveWidgetPropertyReferences(property[i], widgets, providers, referencedWidgets);
+          property[i] = await this.resolveWidgetPropertyReferences({
+            property: property[i],
+            widgets,
+            providers,
+            referencedWidgets,
+            parameters
+          });
         }
         return property;
       } else if ('$ref' in property) {
         return await this.resolveWidgetPropertyReference(property, widgets, providers, referencedWidgets);
       } else {
         for (const p in property) {
-          property[p] = await this.resolveWidgetPropertyReferences(property[p], widgets, providers, referencedWidgets);
+          property[p] = await this.resolveWidgetPropertyReferences({
+            property: property[p],
+            widgets,
+            providers,
+            referencedWidgets,
+            parameters
+          });
         }
+      }
+    } else if (typeof property === 'string' && property.includes(parameterPrefix)) {
+      const elems = property.split(' ');
+      const filtered = elems.filter(elem => elem.trim().length > 0);
+      if (filtered.length === 1) {
+        const paramName = filtered.at(0).split(parameterPrefix).at(1);
+        const paramValue = parameters[paramName];
+        return !isNil(paramValue) ? paramValue : elems.join(' ');
+      } else {
+        return elems.map((elem: string) => {
+          if (elem.startsWith(parameterPrefix)) {
+            const paramName = elem.split(parameterPrefix).at(1)?.trim();
+            const paramValue = parameters[paramName];
+            return !isNil(paramValue) ? paramValue : elem;
+          }
+          return elem;
+        }).join(' ');
       }
     }
 

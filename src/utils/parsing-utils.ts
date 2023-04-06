@@ -31,7 +31,11 @@ function castToType (value: any, type: Parameter.type | string) {
       case Parameter.type.STRING:
         return value.toString();
       case Parameter.type.BOOLEAN:
-        return value === 'true';
+        return value === 'true' ?
+          true :
+          value === 'false' ?
+            false :
+            value;
       case Parameter.type.DATE:
         return new Date(value);
       case Parameter.type.NUMBER: {
@@ -68,7 +72,7 @@ function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {},
       return Object.fromEntries(
         Object.entries(parameters).map(([key, value]) => {
           const parameterDefinition = dashboardContext.parameters.find(param => param.name === key);
-          const parameterType = parameterDefinition.type || 'string';
+          const parameterType = parameterDefinition?.type || 'string';
           const castValue = castToType(value, parameterType);
           return [key, castValue];
         })
