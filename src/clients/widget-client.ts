@@ -32,8 +32,6 @@ const WidgetClient = {
         dashboardId,
         parameters = {}
       } = args;
-      global.console.debug('WidgetClient.getWidget - parameters: ', parameters);
-      global.console.debug('WidgetClient.getWidget - dashboardId: ', dashboardId);
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];

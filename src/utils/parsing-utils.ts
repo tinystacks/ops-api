@@ -1,7 +1,7 @@
-import isEqual from 'lodash.isequal';
 import { Parameter } from '@tinystacks/ops-model';
 import { DashboardParser } from '@tinystacks/ops-core';
 import { Json } from '../types/index.js';
+import difference from 'lodash.difference';
 
 function parseObjectTypeQueryParam (paramName: string, queryParams: any = {}) {
   const queryParam = queryParams[paramName];
@@ -64,12 +64,12 @@ function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {},
         const parameterNames = dashboard.parameters.map(param => param.name).sort();
         return (
           dashboard.widgetIds.includes(widgetId) &&
-          isEqual(parameterKeys, parameterNames)
+          difference(parameterKeys, parameterNames).length === 0
         );
       });
 
     if (dashboardContext) {
-      return Object.fromEntries(
+      const castParameters = Object.fromEntries(
         Object.entries(parameters).map(([key, value]) => {
           const parameterDefinition = dashboardContext.parameters.find(param => param.name === key);
           const parameterType = parameterDefinition?.type || 'string';
@@ -77,6 +77,28 @@ function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {},
           return [key, castValue];
         })
       );
+      const existingParams = Object.keys(castParameters);
+      const defaultParameters = dashboardContext.parameters.filter(param => !existingParams.includes(param.name))
+        .reduce((acc: Json, param: Parameter): Json => {
+          const {
+            name,
+            type,
+            default: defaultValue
+          } = param;
+
+          if (defaultValue) {
+            acc[name] = type ? castToType(defaultValue, type) : defaultValue;
+          }
+
+          return acc;
+        }, {});
+
+      console.debug('castParameters: ', castParameters);
+      console.debug('defaultParameters: ', defaultParameters);
+      return {
+        ...defaultParameters,
+        ...castParameters
+      };
     }
   }
   return parameters;

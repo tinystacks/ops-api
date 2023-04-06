@@ -6,7 +6,6 @@ export default function () {
   return {
     async GET (request: Request, response: Response, next: NextFunction) {
       try {
-        global.console.debug('GET widget route - request.query: ', request.query);
         const overrides = parseObjectTypeQueryParam('overrides', request.query);
         const dashboardId = request.query?.dashboardId as string;
         const parameters = parseObjectTypeQueryParam('parameters', request.query);
