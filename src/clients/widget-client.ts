@@ -11,7 +11,7 @@ import {
   HydrateWidgetReferencesArguments,
   ResolveWidgetPropertyReferencesArguments
 } from '../types/index.js';
-import { castParametersToDeclaredTypes } from '../utils/parsing-utils.js';
+import { castParametersToDeclaredTypes, castToType } from '../utils/parsing-utils.js';
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -36,14 +36,15 @@ const WidgetClient = {
       const console = await consoleClient.getConsole(consoleName);
       const widget: BaseWidget = console.widgets[widgetId];
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      const { widgets, providers, dashboards = {} } = console;
+      const { widgets, providers, dashboards = {}, constants = {} } = console;
       const typeCastParameters = castParametersToDeclaredTypes(widgetId, parameters, dashboards, dashboardId);
       return await this.hydrateWidgetReferences({
         widget,
         widgets,
         providers,
         overrides,
-        parameters: typeCastParameters
+        parameters: typeCastParameters,
+        constants
       });
     } catch (error) {
       return this.handleError(error);
@@ -110,7 +111,8 @@ const WidgetClient = {
       widgets,
       providers,
       overrides,
-      parameters
+      parameters,
+      constants
     } = args;
     const referencedWidgets: Record<string, Widget> = {};
     const resolvedWidget = await this.resolveWidgetPropertyReferences({
@@ -118,7 +120,8 @@ const WidgetClient = {
       widgets,
       providers,
       referencedWidgets,
-      parameters
+      parameters,
+      constants
     });
 
 
@@ -136,9 +139,11 @@ const WidgetClient = {
       widgets,
       providers,
       referencedWidgets,
-      parameters = {}
+      parameters = {},
+      constants = {}
     } = args;
     const parameterPrefix = '$param.';
+    const constantPrefix = '$const.';
     if (typeof property === 'object') {
       // TODO: Sort out this ref tracing in core
       // TODO: Cycle detection (also in core)
@@ -149,7 +154,8 @@ const WidgetClient = {
             widgets,
             providers,
             referencedWidgets,
-            parameters
+            parameters,
+            constants
           });
         }
         return property;
@@ -162,7 +168,8 @@ const WidgetClient = {
             widgets,
             providers,
             referencedWidgets,
-            parameters
+            parameters,
+            constants
           });
         }
       }
@@ -179,6 +186,29 @@ const WidgetClient = {
             const paramName = elem.split(parameterPrefix).at(1)?.trim();
             const paramValue = parameters[paramName];
             return !isNil(paramValue) ? paramValue : elem;
+          }
+          return elem;
+        }).join(' ');
+      }
+    } else if (typeof property === 'string' && property.includes(constantPrefix)) {
+      const elems = property.split(' ');
+      const filtered = elems.filter(elem => elem.trim().length > 0);
+      if (filtered.length === 1) {
+        const constName = filtered.at(0).split(constantPrefix).at(1);
+        const constant = constants[constName];
+        const constValue = constant?.value;
+        const constType = constant?.type;
+        const castConstType = constValue && constType ? castToType(constValue, constType) : constValue;
+        return !isNil(castConstType) ? castConstType : elems.join(' ');
+      } else {
+        return elems.map((elem: string) => {
+          if (elem.startsWith(constantPrefix)) {
+            const constName = elem.split(constantPrefix).at(1)?.trim();
+            const constant = constants[constName];
+            const constValue = constant?.value;
+            const constType = constant?.type;
+            const castConstType = constValue && constType ? castToType(constValue, constType) : constValue;
+            return !isNil(castConstType) ? castConstType : elem;
           }
           return elem;
         }).join(' ');
