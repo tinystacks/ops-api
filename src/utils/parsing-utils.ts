@@ -97,9 +97,6 @@ function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {},
 
           return acc;
         }, {});
-
-      console.debug('castParameters: ', castParameters);
-      console.debug('defaultParameters: ', defaultParameters);
       return {
         ...defaultParameters,
         ...castParameters
