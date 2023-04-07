@@ -10,7 +10,7 @@ function parseObjectTypeQueryParam (paramName: string, queryParams: any = {}) {
     try {
       queryParamObject = JSON.parse(queryParam);
     } catch (e) {
-      console.error(`Non-parseable query param ${paramName}`);
+      console.error(`Non-parseable query param ${paramName}!`);
       console.error(e);
     }
   } else if (typeof queryParam === 'object') {
@@ -18,7 +18,7 @@ function parseObjectTypeQueryParam (paramName: string, queryParams: any = {}) {
       // make sure it is serializeable JSON
       queryParamObject = JSON.parse(JSON.stringify(queryParam));
     } catch (e) {
-      console.error(`Non-serializeable query param ${paramName}`);
+      console.error(`Non-serializeable query param ${paramName}!`);
       console.error(e);
     }
   }
@@ -31,13 +31,18 @@ function castToType (value: any, type: Parameter.type | string) {
       case Parameter.type.STRING:
         return value.toString();
       case Parameter.type.BOOLEAN:
-        return value === 'true' ?
-          true :
-          value === 'false' ?
-            false :
-            value;
-      case Parameter.type.DATE:
-        return new Date(value);
+        if (value === 'true' || value === true) {
+          return true;
+        } else if (value === 'false' || value === false) {
+          return false;
+        }
+        throw new Error('Invalid boolean');
+      case Parameter.type.DATE: {
+        const dateValue = new Date(value);
+        const dateString = dateValue.toString();
+        if (dateString !== 'Invalid Date') return dateValue;
+        throw new Error(dateString);
+      }
       case Parameter.type.NUMBER: {
         const numValue = Number(value);
         if (Number.isNaN(numValue)) {
@@ -106,5 +111,6 @@ function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {},
 
 export {
   parseObjectTypeQueryParam,
+  castToType,
   castParametersToDeclaredTypes
 };
