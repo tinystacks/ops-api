@@ -31,7 +31,8 @@ describe('dashboard controller tests', () => {
     const requestBody: Dashboard = {
       id: 'mock-dashboard',
       route: '/mock-dashboard',
-      widgetIds: []
+      widgetIds: [],
+      parameters: []
     };
     await DashboardController.postDashboard('mock-console', requestBody);
     expect(mockCreateDashboard).toBeCalled();
@@ -42,14 +43,19 @@ describe('dashboard controller tests', () => {
     const requestBody: Dashboard = {
       id: 'mock-dashboard',
       route: '/mock-dashboard',
-      widgetIds: []
+      widgetIds: [],
+      parameters: []
     };
     await DashboardController.putDashboard('mock-console', '/mock-dashboard-2', requestBody);
     expect(mockUpdateDashboard).toBeCalled();
-    expect(mockUpdateDashboard).toBeCalledWith('mock-console', '/mock-dashboard-2', {
-      ...requestBody,
-      route: '/mock-dashboard-2'
-    });
+    expect(mockUpdateDashboard).toBeCalledWith(
+      'mock-console',
+      '/mock-dashboard-2',
+      {
+        ...requestBody,
+        route: '/mock-dashboard-2'
+      }
+    );
   });
   it('deleteDashboard', async () => {
     mockDeleteDashboard.mockResolvedValueOnce({ toJson: () => '' });

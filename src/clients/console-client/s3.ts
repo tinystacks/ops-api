@@ -73,7 +73,7 @@ class S3ConsoleClient implements IConsoleClient {
     return accumulator;
   }
 
-  private async getConfig () {   
+  private async getConfig () {
     const {
       bucketName,
       parentDirectory,
@@ -98,7 +98,7 @@ class S3ConsoleClient implements IConsoleClient {
             existingDirs.push(subdir);
           }
         }
-        
+
         const fileObject = await this.s3Client.getObject({
           Bucket: bucketName,
           Key: file
@@ -171,7 +171,7 @@ class S3ConsoleClient implements IConsoleClient {
     const configPath = process.env.CONFIG_PATH;
     if (configPath) {
       /**
-       * TODO: There's probably lots of room for refactoring here. 
+       * TODO: There's probably lots of room for refactoring here.
        * We can probably re-use the local client on top of the tmp directory created by this s3 client so the below code isn't as duplicative?
        * Something to think about later anyways
        */
@@ -180,14 +180,14 @@ class S3ConsoleClient implements IConsoleClient {
       const configJson = (yaml.load(configFile.toString()) as any)?.Console as YamlConsole;
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
-        const consoleType: ConsoleType = ConsoleParser.parse(configJson); 
+        const consoleType: ConsoleType = ConsoleParser.parse(configJson);
         return ConsoleParser.fromJson(consoleType);
       }
       throw HttpError.InternalServerError('Cannot fetch console! The contents of the config file was empty or invalid!');
     }
     throw HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!');
   }
-  
+
   async getConsoles (): Promise<ConsoleParser[]> {
     const consoles = [];
     const console = await this.getConsole();

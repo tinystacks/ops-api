@@ -55,7 +55,7 @@ const mockS3Client = {
   getObject: mockGetObject,
   putObject: mockPutObject,
   deleteObject: mockDeleteObject
-}
+};
 
 let s3ConsoleClient: S3ConsoleClient;
 describe('local console client tests', () => {
@@ -121,20 +121,20 @@ describe('local console client tests', () => {
         Body: {
           transformToString: () => mockConfigYaml
         }
-      })
+      });
       mockTryToReadFile.mockReturnValueOnce(Buffer.from(mockConfigYaml));
       mockLoad.mockReturnValueOnce({
         Console: mockConsole
       });
-    
+
       const result = await s3ConsoleClient.getConsole();
-    
-      expect(mockListObjectsV2).toBeCalled()
-      expect(mockListObjectsV2).toBeCalledTimes(1)
+
+      expect(mockListObjectsV2).toBeCalled();
+      expect(mockListObjectsV2).toBeCalledTimes(1);
       expect(mockListObjectsV2).toBeCalledWith({
         Bucket: mockConfigBucket,
         Prefix: mockUser
-      })
+      });
 
       expect(mockMkdirSync).toBeCalled();
       expect(mockMkdirSync).toBeCalledTimes(2);
@@ -176,10 +176,10 @@ describe('local console client tests', () => {
       mockLoad.mockReturnValueOnce({
         Console: mockConsole
       });
-    
+
       const result = await s3ConsoleClient.getConsole();
-    
-      expect(mockListObjectsV2).not.toBeCalled()
+
+      expect(mockListObjectsV2).not.toBeCalled();
 
       expect(mockMkdirSync).toBeCalled();
       expect(mockMkdirSync).toBeCalledTimes(1);
@@ -204,7 +204,6 @@ describe('local console client tests', () => {
     });
     it('throws InternalServerError if yaml cannot be loaded', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockConfigFileName}`;
-      const mockConsole = { ...mockConsoleJson };
       process.env.CONFIG_PATH = mockConfigPath;
       mockGetObject.mockResolvedValueOnce({
         Body: {
@@ -239,6 +238,7 @@ describe('local console client tests', () => {
       expect(result).toEqual([mockConsole]);
     });
     it('returns empty array if console does not exist', async () => {
+      // @ts-ignore
       jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(undefined);
 
       const result = await s3ConsoleClient.getConsoles();
@@ -267,8 +267,8 @@ describe('local console client tests', () => {
 
       process.env.CONFIG_PATH = mockConfigPath;
       mockDump.mockReturnValueOnce(mockConfigYaml);
-      jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole)
-    
+      jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
+
       const result = await s3ConsoleClient.saveConsole(mockConsoleName, mockConsole);
 
       expect(mockDump).toBeCalled();
@@ -291,7 +291,7 @@ describe('local console client tests', () => {
         Key: 'mock-user/mock-config.yml',
         Body: mockConfigYaml
       });
-      
+
       expect(S3ConsoleClient.prototype.getConsole).toBeCalled();
       expect(result).toEqual(mockConsole);
     });
@@ -350,11 +350,11 @@ describe('local console client tests', () => {
         ]
       });
       jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
-    
+
       const result = await s3ConsoleClient.deleteConsole(mockConsoleName);
-    
+
       expect(S3ConsoleClient.prototype.getConsole).toBeCalled();
-      
+
       expect(mockListObjectsV2).toBeCalled();
       expect(mockListObjectsV2).toBeCalledWith({
         Bucket: mockConfigBucket,
@@ -376,7 +376,7 @@ describe('local console client tests', () => {
       expect(mockRmSync).toBeCalledTimes(2);
       expect(mockRmSync).toBeCalledWith('/tmp/ops-api/mock-user/mock-config.yml', { recursive: true, force: true });
       expect(mockRmSync).toBeCalledWith('/tmp/ops-api/mock-user/extra.yml', { recursive: true, force: true });
-      
+
 
       expect(result).toEqual(mockConsole);
     });
@@ -397,11 +397,11 @@ describe('local console client tests', () => {
         ]
       });
       jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
-    
+
       const result = await s3ConsoleClient.deleteConsole(mockConsoleName);
-    
+
       expect(S3ConsoleClient.prototype.getConsole).toBeCalled();
-      
+
       expect(mockListObjectsV2).toBeCalled();
       expect(mockListObjectsV2).toBeCalledWith({
         Bucket: mockConfigBucket,
@@ -423,7 +423,7 @@ describe('local console client tests', () => {
       expect(mockRmSync).toBeCalledTimes(2);
       expect(mockRmSync).toBeCalledWith('/tmp/ops-api/mock-user/mock-config.yml', { recursive: true, force: true });
       expect(mockRmSync).toBeCalledWith('/tmp/ops-api/mock-user/extra.yml', { recursive: true, force: true });
-      
+
 
       expect(result).toEqual(mockConsole);
     });
@@ -444,10 +444,10 @@ describe('local console client tests', () => {
       } finally {
         expect(s3ConsoleClient.getConsole).toBeCalled();
         expect(mockListObjectsV2).toBeCalled();
-        
+
         expect(mockDeleteObject).not.toBeCalled();
         expect(mockRmSync).not.toBeCalled();
-        
+
         expect(global.console.error).toBeCalled();
         expect(global.console.error).toBeCalledWith('Failed to delete local console mock-console!', mockError);
         expect(thrownError).toBeDefined();

@@ -22,9 +22,9 @@ describe('widget controller tests', () => {
   });
   it('getWidget', async () => {
     mockGetWidget.mockResolvedValueOnce({ toJson: () => '' });
-    await WidgetController.getWidget('mock-console', 'mock-widget');
+    await WidgetController.getWidget({ consoleName: 'mock-console', widgetId: 'mock-widget' });
     expect(mockGetWidget).toBeCalled();
-    expect(mockGetWidget).toBeCalledWith('mock-console', 'mock-widget', undefined);
+    expect(mockGetWidget).toBeCalledWith({ consoleName: 'mock-console', widgetId: 'mock-widget' });
   });
   it('postWidget', async () => {
     const requestBody: Widget = {

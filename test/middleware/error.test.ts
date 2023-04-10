@@ -43,7 +43,7 @@ describe('error middleware tests', () => {
     expect(mockJson).toBeCalledWith({ status: 418, message: 'mock-error' });
     expect(mockNext).toBeCalled();
   });
-  
+
   it('logs error and responds with status and message if the error is a TinyStacksError', async () => {
     const mockError: TinyStacksErrorType = TinyStacksError.fromJson({
       name: 'TinyStacksError',
@@ -62,7 +62,7 @@ describe('error middleware tests', () => {
     expect(mockJson).toBeCalledWith({ status: 418, message: 'mock-error' });
     expect(mockNext).toBeCalled();
   });
-  
+
   it('logs error and responds with status and message if the error matches shape of TinyStacksError', async () => {
     const mockError = {
       name: 'TinyStacksError',
@@ -81,7 +81,7 @@ describe('error middleware tests', () => {
     expect(mockJson).toBeCalledWith({ status: 418, message: 'mock-error' });
     expect(mockNext).toBeCalled();
   });
-  
+
   it('logs error and responds with InternalServerError if the error is a not a TinyStacksError or an HttpError', async () => {
     const mockError = new Error('Error!');
 
@@ -95,7 +95,7 @@ describe('error middleware tests', () => {
     expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured!'));
     expect(mockNext).toBeCalled();
   });
-  
+
   it('logs error and responds with InternalServerError if the error is a not a TinyStacksError or an HttpError even if similar shape', async () => {
     const mockError = {
       message: 'Error!',

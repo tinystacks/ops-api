@@ -94,9 +94,9 @@ describe('local console client tests', () => {
       mockLoad.mockReturnValueOnce({
         Console: mockConsole
       });
-    
+
       const result = await localConsoleClient.getConsole();
-    
+
       expect(mockResolve).toBeCalled();
       expect(mockResolve).toBeCalledWith(mockConfigPath);
       expect(mockTryToReadFile).toBeCalled();
@@ -169,10 +169,10 @@ describe('local console client tests', () => {
       process.env.CONFIG_PATH = mockConfigPath;
       mockResolve.mockReturnValueOnce(mockConfigPath);
       mockDump.mockReturnValueOnce(mockConfigYaml);
-      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole)
-    
+      jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
+
       const result = await localConsoleClient.saveConsole('mock-console', mockConsole);
-    
+
       expect(mockResolve).toBeCalled();
       expect(mockResolve).toBeCalledWith(mockConfigPath);
       expect(mockDump).toBeCalled();
@@ -228,9 +228,9 @@ describe('local console client tests', () => {
       process.env.CONFIG_PATH = mockConfigPath;
       mockResolve.mockReturnValueOnce(mockConfigPath);
       jest.spyOn(LocalConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
-    
+
       const result = await localConsoleClient.deleteConsole('mock-console');
-    
+
       expect(LocalConsoleClient.prototype.getConsole).toBeCalled();
       expect(mockResolve).toBeCalled();
       expect(mockResolve).toBeCalledWith(mockConfigPath);

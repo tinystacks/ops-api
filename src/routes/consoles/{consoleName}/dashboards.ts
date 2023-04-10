@@ -11,7 +11,7 @@ export default function () {
         next(error);
       }
     },
-    
+
     async POST (request: Request, response: Response, next: NextFunction) {
       try {
         const dashboard = await DashboardController.postDashboard(request.params.consoleName, request.body);

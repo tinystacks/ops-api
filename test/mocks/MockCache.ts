@@ -21,7 +21,7 @@ export class MockCache {
     this.set.mockReset();
     this.getOrElse.mockReset();
   }
-  
+
   restore () {
     this.get.mockRestore();
     this.set.mockRestore();

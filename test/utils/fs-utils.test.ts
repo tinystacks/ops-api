@@ -29,7 +29,7 @@ describe('FsUtils tests', () => {
       expect(console.error).toBeCalledWith('An error occured when reading the file specified at ./mock!', mockError);
       expect(file).toBeUndefined();
     });
-    
+
     it('logs warning and returns undefined if the file is nil', () => {
       mockReadFileSync.mockReturnValueOnce(undefined);
 

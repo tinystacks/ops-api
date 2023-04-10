@@ -5,9 +5,9 @@ import { DashboardParser } from '@tinystacks/ops-core';
 const DashboardController = {
   async getDashboards (consoleName: string): Promise<DashboardType[]> {
     const dashboards : DashboardParser[] = await DashboardClient.getDashboards(consoleName);
-    const dashboardTypes: DashboardType[] = dashboards.map( (dashboard) => { 
+    const dashboardTypes: DashboardType[] = dashboards.map( (dashboard) => {
       return dashboard.toJson();
-    }); 
+    });
     return dashboardTypes;
   },
   async postDashboard (consoleName: string, createDashboardBody: DashboardType): Promise<DashboardType> {

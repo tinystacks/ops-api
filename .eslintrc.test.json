@@ -75,6 +75,8 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/ban-ts-comment": "warn",
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
       "error",
@@ -86,6 +88,14 @@
       }
     ],
     "import/no-cycle": "error",
-    "no-shadow": "error"
+    "no-shadow": "error",
+    "no-trailing-spaces": "error",
+    "brace-style": [
+      "error",
+      "1tbs",
+      {
+        "allowSingleLine": true
+      }
+    ]
   }
 }

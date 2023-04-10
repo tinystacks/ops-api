@@ -8,7 +8,7 @@ import WidgetClient from '../../src/clients/widget-client.js';
 import HttpError from 'http-errors';
 import { BasicWidget } from '../utils/basic-widget.js';
 import { ConsoleParser } from '@tinystacks/ops-core';
-import { Widget, Console } from '@tinystacks/ops-model';
+import { Widget, Console, Parameter } from '@tinystacks/ops-model';
 
 const basicConsole = {
   name: 'mock-console',
@@ -36,7 +36,7 @@ const basicConsoleWithWidget: Console = {
 describe('widget client tests', () => {
   beforeEach(() => {
     jest.spyOn(WidgetClient, 'getWidget');
-    
+
     mockConsoleClient.mockReturnValue({
       getConsole: mockGetConsole,
       saveConsole: mockSaveConsole
@@ -98,7 +98,10 @@ describe('widget client tests', () => {
       const mockWidget = basicWidget;
       const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
-      const result = await WidgetClient.getWidget(basicConsoleWithWidget.name, basicWidget.id);
+      const result = await WidgetClient.getWidget({
+        consoleName: basicConsoleWithWidget.name,
+        widgetId: basicWidget.id
+      });
 
       expect(result).toEqual(mockWidget);
     });
@@ -108,7 +111,10 @@ describe('widget client tests', () => {
 
       let thrownError;
       try {
-        await WidgetClient.getWidget('mock-console', basicWidget.id);
+        await WidgetClient.getWidget({
+          consoleName: 'mock-console',
+          widgetId: basicWidget.id
+        });
       } catch (error) {
         thrownError = error;
       } finally {
@@ -118,6 +124,60 @@ describe('widget client tests', () => {
         );
       }
     });
+    it('replaces parameter references with parameter values', async () => {
+      const mockGetData = jest.fn();
+      const mockWidget = {
+        id: 'MockWidget',
+        displayName: 'Mock $param.param2 Widget',
+        type: 'MockWidget',
+        otherProp: '$param.param1',
+        otherOtherProp: 'static text',
+        getData: mockGetData
+      };
+      const mockConsole = {
+        ...basicConsole,
+        dashboards: {
+          Main: {
+            id: 'Main',
+            route: '/main',
+            parameters: [
+              {
+                name: 'param1',
+                default: 'param 1',
+                type: Parameter.type.STRING
+              },
+              {
+                name: 'param2',
+                default: 'param 2',
+                type: Parameter.type.STRING
+              }
+            ],
+            widgetIds: [
+              'MockWidget'
+            ]
+          }
+        },
+        widgets: {
+          MockWidget: mockWidget
+        }
+      };
+      mockGetConsole.mockResolvedValueOnce(mockConsole);
+      const result = await WidgetClient.getWidget({
+        consoleName: basicConsole.name,
+        widgetId: 'MockWidget',
+        parameters: { param1: 'overridden param value' },
+        dashboardId: 'Main'
+      });
+
+      expect(result).toEqual({
+        id: 'MockWidget',
+        displayName: 'Mock param 2 Widget',
+        type: 'MockWidget',
+        otherProp: 'overridden param value',
+        otherOtherProp: 'static text',
+        getData: mockGetData
+      });
+    });
   });
 
   describe('getWidgets', () => {
@@ -126,7 +186,10 @@ describe('widget client tests', () => {
       const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
-      const result = await WidgetClient.getWidget('mock-console', basicWidget.id);
+      const result = await WidgetClient.getWidget({
+        consoleName: 'mock-console',
+        widgetId: basicWidget.id
+      });
 
       expect(result).toEqual(mockWidget);
     });
@@ -136,7 +199,10 @@ describe('widget client tests', () => {
 
       let thrownError;
       try {
-        await WidgetClient.getWidget('mock-console', basicWidget.id);
+        await WidgetClient.getWidget({
+          consoleName: 'mock-console',
+          widgetId: basicWidget.id
+        });
       } catch (error) {
         thrownError = error;
       } finally {

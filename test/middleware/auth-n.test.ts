@@ -10,7 +10,7 @@ import {
   Response
 } from 'express';
 import HttpError from 'http-errors';
-import { MockCache } from "../mocks/MockCache";
+import { MockCache } from '../mocks/MockCache';
 
 const mockApiKeyId = 'mock-api-key-id';
 const mockApiKeySecret = 'mock-api-key-secret';
@@ -103,7 +103,7 @@ describe('auth-n middleware tests', () => {
 
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(401);
-      
+
       expect(mockSend).toBeCalled();
       expect(mockSend).toBeCalledWith(HttpError.Unauthorized('Authentication is required!'));
     });
@@ -120,7 +120,7 @@ describe('auth-n middleware tests', () => {
       expect(mockGetApiKey).not.toBeCalled();
 
       expect(mockNext).not.toBeCalled();
-      
+
       expect(console.warn).toBeCalled();
       expect(console.warn).toBeCalledTimes(1);
       expect(console.warn).toBeCalledWith('No API_KEY_ID is set! All requests will fail with 401s!');
@@ -131,7 +131,7 @@ describe('auth-n middleware tests', () => {
 
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(401);
-      
+
       expect(mockSend).toBeCalled();
       expect(mockSend).toBeCalledWith(HttpError.Unauthorized('Authentication is required!'));
     });
@@ -159,7 +159,7 @@ describe('auth-n middleware tests', () => {
 
       expect(mockStatus).toBeCalled();
       expect(mockStatus).toBeCalledWith(401);
-      
+
       expect(mockSend).toBeCalled();
       expect(mockSend).toBeCalledWith(HttpError.Unauthorized('Authentication is required!'));
     });
@@ -184,10 +184,10 @@ describe('auth-n middleware tests', () => {
       expect(console.error).not.toBeCalled();
       expect(mockStatus).not.toBeCalled();
       expect(mockSend).not.toBeCalled();
-      
+
       expect(mockCache.getOrElse).toBeCalled();
       expect(mockCache.getOrElse).toBeCalledWith(mockApiKeyId, expect.any(Function));
-      
+
       expect(mockFromIni).toBeCalled();
       expect(mockFromIni).toBeCalledWith({ profile: 'ts' });
 
@@ -196,7 +196,7 @@ describe('auth-n middleware tests', () => {
         apiKey: mockApiKeyId,
         includeValue: true
       });
-      
+
       expect(mockNext).toBeCalled();
     });
   });

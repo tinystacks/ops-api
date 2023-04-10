@@ -11,7 +11,7 @@ export default function () {
         next(error);
       }
     },
-    
+
     async POST (request: Request, response: Response, next: NextFunction) {
       try {
         const console = await ConsoleController.postConsole(request.body);
