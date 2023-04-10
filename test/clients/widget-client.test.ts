@@ -128,7 +128,7 @@ describe('widget client tests', () => {
       const mockGetData = jest.fn();
       const mockWidget = {
         id: 'MockWidget',
-        displayName: 'Mock $param.param2 $param.param3 Widget',
+        displayName: 'Mock $param.param2 $param.param3 $const.const1 Widget',
         type: 'MockWidget',
         otherProp: '$param.param1',
         otherOtherProp: 'static text',
@@ -137,6 +137,12 @@ describe('widget client tests', () => {
       };
       const mockConsole = {
         ...basicConsole,
+        constants: {
+          const1: {
+            value: 'const 1',
+            type: 'string'
+          }
+        },
         dashboards: {
           Main: {
             id: 'Main',
@@ -172,7 +178,7 @@ describe('widget client tests', () => {
 
       expect(result).toEqual({
         id: 'MockWidget',
-        displayName: 'Mock param 2 $param.param3 Widget',
+        displayName: 'Mock param 2 $param.param3 const 1 Widget',
         type: 'MockWidget',
         otherProp: 'overridden param value',
         otherOtherProp: 'static text',
