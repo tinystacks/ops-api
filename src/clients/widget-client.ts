@@ -5,7 +5,7 @@ import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
 import get from 'lodash.get';
 import { Widget } from '@tinystacks/ops-model';
-import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
+import { BaseWidget } from '@tinystacks/ops-core';
 import {
   GetWidgetArguments,
   HydrateWidgetReferencesArguments,
@@ -154,7 +154,7 @@ const WidgetClient = {
         }
         return property;
       } else if ('$ref' in property) {
-        return await this.resolveWidgetPropertyReference(property, widgets, providers, referencedWidgets);
+        return await this.resolveWidgetPropertyReference({ property, widgets, providers, referencedWidgets, parameters });
       } else {
         for (const p in property) {
           property[p] = await this.resolveWidgetPropertyReferences({
@@ -187,17 +187,22 @@ const WidgetClient = {
 
     return property;
   },
-  async resolveWidgetPropertyReference (
-    property: any, widgets: Record<string, BaseWidget>, providers: Record<string, BaseProvider>,
-    referencedWidgets: Record<string, Widget>
-  ) {
+  async resolveWidgetPropertyReference (args: ResolveWidgetPropertyReferencesArguments) {
+    const {
+      property,
+      widgets,
+      providers,
+      referencedWidgets,
+      parameters = {}
+    } = args;
     const widgetId = property.$ref.split('/')[3];
     const refWidget = widgets[widgetId];
     if (!referencedWidgets[refWidget.id]) {
       referencedWidgets[refWidget.id] = await this.hydrateWidgetReferences({
         widget: refWidget,
         widgets,
-        providers
+        providers,
+        parameters
       });
     }
     const fullRefWidget = referencedWidgets[refWidget.id];
