@@ -315,7 +315,7 @@ describe('parsing-utils', () => {
       const result = castToType('abc', 'nonsense');
 
       expect(console.error).toBeCalled();
-      expect(console.error).toBeCalledWith('Invalid parameter type nonsense!');
+      expect(console.error).toBeCalledWith('Invalid type nonsense!');
       expect(result).toEqual('abc');
     });
   });

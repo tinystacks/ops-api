@@ -128,10 +128,11 @@ describe('widget client tests', () => {
       const mockGetData = jest.fn();
       const mockWidget = {
         id: 'MockWidget',
-        displayName: 'Mock $param.param2 Widget',
+        displayName: 'Mock $param.param2 $param.param3 Widget',
         type: 'MockWidget',
         otherProp: '$param.param1',
         otherOtherProp: 'static text',
+        thirdProp: '$param.param3',
         getData: mockGetData
       };
       const mockConsole = {
@@ -171,10 +172,68 @@ describe('widget client tests', () => {
 
       expect(result).toEqual({
         id: 'MockWidget',
-        displayName: 'Mock param 2 Widget',
+        displayName: 'Mock param 2 $param.param3 Widget',
         type: 'MockWidget',
         otherProp: 'overridden param value',
         otherOtherProp: 'static text',
+        thirdProp: '$param.param3',
+        getData: mockGetData
+      });
+    });
+    it('replaces constant references with constant values', async () => {
+      const mockGetData = jest.fn();
+      const mockWidget = {
+        id: 'MockWidget',
+        displayName: 'Mock $const.const2 $const.const3 $const.const4 Widget',
+        type: 'MockWidget',
+        otherProp: '$const.const1',
+        otherOtherProp: 'static text',
+        thirdProp: '$const.const3',
+        fourthProp: '$const.const4',
+        getData: mockGetData
+      };
+      const mockConsole = {
+        ...basicConsole,
+        constants: {
+          const1: {
+            value: 'const 1',
+            type: 'string'
+          },
+          const2: {
+            value: 'const 2',
+            type: 'string'
+          },
+          const3: {
+            value: 'const 3'
+          },
+        },
+        dashboards: {
+          Main: {
+            id: 'Main',
+            route: '/main',
+            widgetIds: [
+              'MockWidget'
+            ]
+          }
+        },
+        widgets: {
+          MockWidget: mockWidget
+        }
+      };
+      mockGetConsole.mockResolvedValueOnce(mockConsole);
+      const result = await WidgetClient.getWidget({
+        consoleName: basicConsole.name,
+        widgetId: 'MockWidget'
+      });
+
+      expect(result).toEqual({
+        id: 'MockWidget',
+        displayName: 'Mock const 2 const 3 $const.const4 Widget',
+        type: 'MockWidget',
+        otherProp: 'const 1',
+        otherOtherProp: 'static text',
+        thirdProp: 'const 3',
+        fourthProp: '$const.const4',
         getData: mockGetData
       });
     });
