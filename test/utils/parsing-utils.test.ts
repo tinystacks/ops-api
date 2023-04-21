@@ -258,7 +258,7 @@ describe('parsing-utils', () => {
         expect(result).toEqual(true);
       });
       it('logs an error for non-castable value and returns original value', () => {
-        jest.spyOn(global.console, 'error');
+        jest.spyOn(global.console, 'error').mockImplementation(jest.fn());
 
         const result = castToType('abc', Parameter.type.BOOLEAN);
 
@@ -279,7 +279,7 @@ describe('parsing-utils', () => {
         expect(result).toEqual(new Date('2023-04-07'));
       });
       it('logs an error for non-castable value and returns original value', () => {
-        jest.spyOn(global.console, 'error');
+        jest.spyOn(global.console, 'error').mockImplementation(jest.fn());;
 
         const result = castToType('abc', Parameter.type.DATE);
 
@@ -300,7 +300,7 @@ describe('parsing-utils', () => {
         expect(result).toEqual(321);
       });
       it('logs an error for non-castable value and returns original value', () => {
-        jest.spyOn(global.console, 'error');
+        jest.spyOn(global.console, 'error').mockImplementation(jest.fn());
 
         const result = castToType('abc', Parameter.type.NUMBER);
 
@@ -310,7 +310,7 @@ describe('parsing-utils', () => {
       });
     });
     it('default', () => {
-      jest.spyOn(global.console, 'error');
+      jest.spyOn(global.console, 'error').mockImplementation(jest.fn());
 
       const result = castToType('abc', 'nonsense');
 

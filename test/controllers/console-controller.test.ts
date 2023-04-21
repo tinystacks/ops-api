@@ -12,6 +12,7 @@ import { Console } from '@tinystacks/ops-model';
 import ConsoleController from '../../src/controllers/console-controller.js';
 const requestBody: Console = {
   name: 'mock-console',
+  constants: {},
   dashboards: {},
   providers: {},
   widgets: {},

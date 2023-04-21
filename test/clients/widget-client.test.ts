@@ -219,7 +219,8 @@ describe('widget client tests', () => {
             route: '/main',
             widgetIds: [
               'MockWidget'
-            ]
+            ],
+            parameters: [] as Parameter[]
           }
         },
         widgets: {
