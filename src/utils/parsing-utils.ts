@@ -61,47 +61,45 @@ function castToType (value: any, type: Constant.type | Parameter.type | string) 
 }
 
 function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {}, dashboards: Record<string, DashboardParser> = {}, dashboardId?: string): Json {
-  if (Object.keys(parameters).length > 0) {
-    const parameterKeys = Object.keys(parameters).sort();
-    const dashboardContext = dashboardId ?
-      dashboards[dashboardId] :
-      Object.values(dashboards).find((dashboard) => {
-        const parameterNames = dashboard.parameters.map(param => param.name).sort();
-        return (
-          dashboard.widgetIds.includes(widgetId) &&
-          difference(parameterKeys, parameterNames).length === 0
-        );
-      });
-
-    if (dashboardContext) {
-      const castParameters = Object.fromEntries(
-        Object.entries(parameters).map(([key, value]) => {
-          const parameterDefinition = dashboardContext.parameters.find(param => param.name === key);
-          const parameterType = parameterDefinition?.type || 'string';
-          const castValue = castToType(value, parameterType);
-          return [key, castValue];
-        })
+  const parameterKeys = Object.keys(parameters).sort();
+  const dashboardContext = dashboardId ?
+    dashboards[dashboardId] :
+    Object.values(dashboards).find((dashboard) => {
+      const parameterNames = dashboard.parameters.map(param => param.name).sort();
+      return (
+        dashboard.widgetIds.includes(widgetId) &&
+        difference(parameterKeys, parameterNames).length === 0
       );
-      const existingParams = Object.keys(castParameters);
-      const defaultParameters = dashboardContext.parameters.filter(param => !existingParams.includes(param.name))
-        .reduce((acc: Json, param: Parameter): Json => {
-          const {
-            name,
-            type,
-            default: defaultValue
-          } = param;
+    });
 
-          if (defaultValue) {
-            acc[name] = type ? castToType(defaultValue, type) : defaultValue;
-          }
+  if (dashboardContext) {
+    const castParameters = Object.fromEntries(
+      Object.entries(parameters).map(([key, value]) => {
+        const parameterDefinition = dashboardContext.parameters.find(param => param.name === key);
+        const parameterType = parameterDefinition?.type || 'string';
+        const castValue = castToType(value, parameterType);
+        return [key, castValue];
+      })
+    );
+    const existingParams = Object.keys(castParameters);
+    const defaultParameters = dashboardContext.parameters.filter(param => !existingParams.includes(param.name))
+      .reduce((acc: Json, param: Parameter): Json => {
+        const {
+          name,
+          type,
+          default: defaultValue
+        } = param;
 
-          return acc;
-        }, {});
-      return {
-        ...defaultParameters,
-        ...castParameters
-      };
-    }
+        if (defaultValue) {
+          acc[name] = type ? castToType(defaultValue, type) : defaultValue;
+        }
+
+        return acc;
+      }, {});
+    return {
+      ...defaultParameters,
+      ...castParameters
+    };
   }
   return parameters;
 }
