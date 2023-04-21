@@ -38,6 +38,8 @@ class LocalConsoleClient implements IConsoleClient {
   }
   async saveConsole (consoleName: string, console: ConsoleParser): Promise<ConsoleParser> {
     console.name = consoleName;
+    const previousConsole = await this.getConsole(consoleName);
+    console.providers = previousConsole.providers;
     const yamlConsole = await console.toYaml();
     const consoleYml = yaml.dump({ Console: yamlConsole });
     const configPath = process.env.CONFIG_PATH;
