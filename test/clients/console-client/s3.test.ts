@@ -251,6 +251,7 @@ describe('local console client tests', () => {
   describe('saveConsole', () => {
     it('throws InternalServerError if CONFIG_PATH is not set', async () => {
       const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
       let thrownError;
       try {
         await s3ConsoleClient.saveConsole(mockConsoleName, mockConsole);
@@ -268,7 +269,7 @@ describe('local console client tests', () => {
 
       process.env.CONFIG_PATH = mockConfigPath;
       mockDump.mockReturnValueOnce(mockConfigYaml);
-      jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValueOnce(mockConsole);
+      jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
 
       const result = await s3ConsoleClient.saveConsole(mockConsoleName, mockConsole);
 
@@ -299,6 +300,7 @@ describe('local console client tests', () => {
     it('logs and re-throws errors', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockUser}/${mockConfigFileName}`;
       const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
       const mockError = new Error();
       process.env.CONFIG_PATH = mockConfigPath;
       mockWriteFileSync.mockImplementationOnce(() => { throw mockError; });
