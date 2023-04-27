@@ -1,5 +1,5 @@
 import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
-import { Widget } from '@tinystacks/ops-model';
+import { Constant, Widget } from '@tinystacks/ops-model';
 
 type Json = {
   [key: string]: any
@@ -19,6 +19,7 @@ type HydrateWidgetReferencesArguments = {
   providers: Record<string, BaseProvider>;
   overrides?: Json;
   parameters?: Json;
+  constants?: Record<string, Constant>;
 };
 
 type ResolveWidgetPropertyReferencesArguments = {
@@ -27,6 +28,7 @@ type ResolveWidgetPropertyReferencesArguments = {
   providers: Record<string, BaseProvider>;
   referencedWidgets: Record<string, Widget>;
   parameters?: Json;
+  constants?: Record<string, Constant>;
 }
 
 export {

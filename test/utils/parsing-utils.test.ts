@@ -279,7 +279,7 @@ describe('parsing-utils', () => {
         expect(result).toEqual(new Date('2023-04-07'));
       });
       it('logs an error for non-castable value and returns original value', () => {
-        jest.spyOn(global.console, 'error').mockImplementation(jest.fn());
+        jest.spyOn(global.console, 'error').mockImplementation(jest.fn());;
 
         const result = castToType('abc', Parameter.type.DATE);
 
@@ -315,7 +315,7 @@ describe('parsing-utils', () => {
       const result = castToType('abc', 'nonsense');
 
       expect(console.error).toBeCalled();
-      expect(console.error).toBeCalledWith('Invalid parameter type nonsense!');
+      expect(console.error).toBeCalledWith('Invalid type nonsense!');
       expect(result).toEqual('abc');
     });
   });

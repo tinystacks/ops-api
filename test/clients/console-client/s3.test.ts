@@ -39,6 +39,7 @@ import { ConsoleParser } from '@tinystacks/ops-core';
 const mockConsoleName = 'mock-console';
 const mockConsoleJson: Console = {
   name: mockConsoleName,
+  constants: {},
   dashboards: {},
   providers: {},
   widgets: {},

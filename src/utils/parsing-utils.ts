@@ -1,4 +1,4 @@
-import { Parameter } from '@tinystacks/ops-model';
+import { Constant, Parameter } from '@tinystacks/ops-model';
 import { DashboardParser } from '@tinystacks/ops-core';
 import { Json } from '../types/index.js';
 import difference from 'lodash.difference';
@@ -25,25 +25,25 @@ function parseObjectTypeQueryParam (paramName: string, queryParams: any = {}) {
   return queryParamObject;
 }
 
-function castToType (value: any, type: Parameter.type | string) {
+function castToType (value: any, type: Constant.type | Parameter.type | string) {
   try {
     switch (type) {
-      case Parameter.type.STRING:
+      case Parameter.type.STRING || Constant.type.STRING:
         return value.toString();
-      case Parameter.type.BOOLEAN:
+      case Parameter.type.BOOLEAN || Constant.type.BOOLEAN:
         if (value === 'true' || value === true) {
           return true;
         } else if (value === 'false' || value === false) {
           return false;
         }
         throw new Error('Invalid boolean');
-      case Parameter.type.DATE: {
+      case Parameter.type.DATE || Constant.type.DATE: {
         const dateValue = new Date(value);
         const dateString = dateValue.toString();
         if (dateString !== 'Invalid Date') return dateValue;
         throw new Error(dateString);
       }
-      case Parameter.type.NUMBER: {
+      case Parameter.type.NUMBER|| Constant.type.NUMBER: {
         const numValue = Number(value);
         if (Number.isNaN(numValue)) {
           throw new Error(numValue.toString());
@@ -51,7 +51,7 @@ function castToType (value: any, type: Parameter.type | string) {
         return numValue;
       }
       default:
-        console.error(`Invalid parameter type ${type}!`);
+        console.error(`Invalid type ${type}!`);
         return value;
     }
   } catch (error) {
