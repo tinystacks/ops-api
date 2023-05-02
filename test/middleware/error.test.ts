@@ -92,7 +92,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(500);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured!'));
+    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured! See the API logs for more details.'));
     expect(mockNext).toBeCalled();
   });
 
@@ -109,7 +109,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(500);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured!'));
+    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured! See the API logs for more details.'));
     expect(mockNext).toBeCalled();
   });
 });

@@ -38,7 +38,7 @@ const WidgetClient = {
       if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
       const { widgets, providers, dashboards = {}, constants = {} } = console;
       const typeCastParameters = castParametersToDeclaredTypes(widgetId, parameters, dashboards, dashboardId);
-      return await this.hydrateWidgetReferences({
+      const hydratedWidget = await this.hydrateWidgetReferences({
         widget,
         widgets,
         providers,
@@ -46,6 +46,7 @@ const WidgetClient = {
         parameters: typeCastParameters,
         constants
       });
+      return hydratedWidget;
     } catch (error) {
       return this.handleError(error);
     }
@@ -160,7 +161,7 @@ const WidgetClient = {
         }
         return property;
       } else if ('$ref' in property) {
-        return await this.resolveWidgetPropertyReference({ property, widgets, providers, referencedWidgets, parameters });
+        return await this.resolveWidgetPropertyReference({ property, widgets, providers, referencedWidgets, parameters, constants });
       } else {
         for (const p in property) {
           property[p] = await this.resolveWidgetPropertyReferences({
@@ -228,7 +229,8 @@ const WidgetClient = {
       widgets,
       providers,
       referencedWidgets,
-      parameters = {}
+      parameters = {},
+      constants = {}
     } = args;
     const widgetId = property.$ref.split('/')[3];
     const refWidget = widgets[widgetId];
@@ -237,11 +239,13 @@ const WidgetClient = {
         widget: refWidget,
         widgets,
         providers,
-        parameters
+        parameters,
+        constants
       });
     }
     const fullRefWidget = referencedWidgets[refWidget.id];
-    return ('path' in property) ? get(fullRefWidget, property.path) : fullRefWidget;
+    const resolvedReference = ('path' in property) ? get(fullRefWidget, property.path) : fullRefWidget;
+    return resolvedReference;
   }
 };
 
