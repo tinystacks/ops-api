@@ -8,7 +8,7 @@ export default async function errorMiddleware (error: unknown, request: Request,
     const { status, message } = error as TinyStacksError | HttpError.HttpError;
     response.status(status).json({ status, message });
   } else {
-    const ise = HttpError.InternalServerError('An unexpected error occured!');
+    const ise = HttpError.InternalServerError('An unexpected error occured! See the API logs for more details.');
     response.status(ise.status).json(ise);
   }
   next();
