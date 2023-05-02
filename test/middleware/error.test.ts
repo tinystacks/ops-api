@@ -5,7 +5,7 @@ const mockJson = jest.fn();
 jest.mock('express');
 
 import { TinyStacksError as TinyStacksErrorType } from '@tinystacks/ops-model';
-import TinyStacksError from '../../src/errors/tinystacks-error';
+import { TinyStacksError } from '@tinystacks/ops-core';
 import errorMiddleware from '../../src/middleware/error';
 import { Request, Response } from 'express';
 import HttpError from 'http-errors';

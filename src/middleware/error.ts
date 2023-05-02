@@ -1,6 +1,6 @@
 import HttpError from 'http-errors';
 import { Request, Response, NextFunction } from 'express';
-import TinyStacksError from '../errors/tinystacks-error.js';
+import { TinyStacksError } from '@tinystacks/ops-core';
 
 export default async function errorMiddleware (error: unknown, request: Request, response: Response, next: NextFunction) {
   console.error(error);
