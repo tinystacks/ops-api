@@ -5,7 +5,7 @@ const mockJson = jest.fn();
 jest.mock('express');
 
 import { TinyStacksError as TinyStacksErrorType } from '@tinystacks/ops-model';
-import TinyStacksError from '../../src/errors/tinystacks-error';
+import { TinyStacksError } from '@tinystacks/ops-core';
 import errorMiddleware from '../../src/middleware/error';
 import { Request, Response } from 'express';
 import HttpError from 'http-errors';
@@ -92,7 +92,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(500);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured!'));
+    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured! See the API logs for more details.'));
     expect(mockNext).toBeCalled();
   });
 
@@ -109,7 +109,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(500);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured!'));
+    expect(mockJson).toBeCalledWith(HttpError.InternalServerError('An unexpected error occured! See the API logs for more details.'));
     expect(mockNext).toBeCalled();
   });
 });
