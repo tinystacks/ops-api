@@ -177,46 +177,52 @@ const WidgetClient = {
     } else if (typeof property === 'string') {
       let subbedProperty = property;
       if (subbedProperty.includes(parameterPrefix)) {
-        const elems = subbedProperty.split(' ');
-        const filtered = elems.filter(elem => elem.trim().length > 0);
-        if (filtered.length === 1) {
-          const paramName = filtered.at(0).split(parameterPrefix).at(1);
-          const paramValue = parameters[paramName];
-          subbedProperty = !isNil(paramValue) ? paramValue : elems.join(' ');
-        } else {
-          subbedProperty = elems.map((elem: string) => {
-            if (elem.startsWith(parameterPrefix)) {
-              const paramName = elem.split(parameterPrefix).at(1)?.trim();
-              const paramValue = parameters[paramName];
-              return !isNil(paramValue) ? paramValue : elem;
-            }
-            return elem;
-          }).join(' ');
-        }
+        const lines = subbedProperty.split('\n');
+        subbedProperty = lines.map((line) => {
+          const elems = line.split(' ');
+          const filtered = elems.filter(elem => elem.trim().length > 0);
+          if (filtered.length === 1) {
+            const paramName = filtered.at(0).split(parameterPrefix).at(1);
+            const paramValue = parameters[paramName];
+            return !isNil(paramValue) ? paramValue : elems.join(' ');
+          } else {
+            return elems.map((elem: string) => {
+              if (elem.startsWith(parameterPrefix)) {
+                const paramName = elem.split(parameterPrefix).at(1)?.trim();
+                const paramValue = parameters[paramName];
+                return !isNil(paramValue) ? paramValue : elem;
+              }
+              return elem;
+            }).join(' ');
+          }
+        }).join('\n');
       }
       if (subbedProperty.includes(constantPrefix)) {
-        const elems = subbedProperty.split(' ');
-        const filtered = elems.filter(elem => elem.trim().length > 0);
-        if (filtered.length === 1) {
-          const constName = filtered.at(0).split(constantPrefix).at(1);
-          const constant = constants[constName];
-          const constValue = constant?.value;
-          const constType = constant?.type;
-          const castConstType = constValue && constType ? castToType(constValue, constType) : constValue;
-          subbedProperty = !isNil(castConstType) ? castConstType : elems.join(' ');
-        } else {
-          subbedProperty = elems.map((elem: string) => {
-            if (elem.startsWith(constantPrefix)) {
-              const constName = elem.split(constantPrefix).at(1)?.trim();
-              const constant = constants[constName];
-              const constValue = constant?.value;
-              const constType = constant?.type;
-              const castConstType = constValue && constType ? castToType(constValue, constType) : constValue;
-              return !isNil(castConstType) ? castConstType : elem;
-            }
-            return elem;
-          }).join(' ');
-        }
+        const lines = subbedProperty.split('\n');
+        subbedProperty = lines.map((line) => {
+          const elems = line.split(' ');
+          const filtered = elems.filter(elem => elem.trim().length > 0);
+          if (filtered.length === 1) {
+            const constName = filtered.at(0).split(constantPrefix).at(1);
+            const constant = constants[constName];
+            const constValue = constant?.value;
+            const constType = constant?.type;
+            const castConstType = constValue && constType ? castToType(constValue, constType) : constValue;
+            return !isNil(castConstType) ? castConstType : elems.join(' ');
+          } else {
+            return elems.map((elem: string) => {
+              if (elem.startsWith(constantPrefix)) {
+                const constName = elem.split(constantPrefix).at(1)?.trim();
+                const constant = constants[constName];
+                const constValue = constant?.value;
+                const constType = constant?.type;
+                const castConstType = constValue && constType ? castToType(constValue, constType) : constValue;
+                return !isNil(castConstType) ? castConstType : elem;
+              }
+              return elem;
+            }).join(' ');
+          }
+        }).join('\n');
       }
       return subbedProperty;
     }
