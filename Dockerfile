@@ -29,6 +29,7 @@ RUN bash ./install-cli-tools.sh
 RUN if [ ! -z "${DEPENDENCIES}" ]; then npm i $DEPENDENCIES;  fi;
 RUN npm run clean-build
 RUN rm -rf ./src
+RUN rm -rf ./install-cli-tools.sh
 RUN npm prune --production
 
 

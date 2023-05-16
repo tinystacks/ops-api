@@ -1,3 +1,4 @@
+.vscode
 .github
 buildspecs
 cdk
@@ -10,3 +11,10 @@ docker-build.sh
 jest.config.js
 tsconfig.test.json
 example.yml
+babel.config.json
+.eslintrc
+eslintrc.test.json
+get-runtime-dependencies.sh
+jest.config.json
+local.sh
+staging.sh
