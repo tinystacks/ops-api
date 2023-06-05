@@ -16,7 +16,6 @@ const DashboardController = {
   },
   async putDashboard (consoleName: string, dashboardId: string, updateDashboardBody: DashboardType): Promise<DashboardType> {
     const dashboard: DashboardParser = DashboardParser.fromJson(updateDashboardBody);
-    dashboard.route = dashboardId;
     return (await DashboardClient.updateDashboard(consoleName, dashboardId, dashboard)).toJson();
   },
   async deleteDashboard (consoleName: string, dashboardId: string): Promise<DashboardType> {
