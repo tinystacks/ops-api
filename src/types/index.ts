@@ -1,4 +1,4 @@
-import { BaseProvider, BaseWidget } from '@tinystacks/ops-core';
+import { BaseProvider, BaseWidget, DashboardParser } from '@tinystacks/ops-core';
 import { Constant, Widget } from '@tinystacks/ops-model';
 
 type Json = {
@@ -20,6 +20,8 @@ type HydrateWidgetReferencesArguments = {
   overrides?: Json;
   parameters?: Json;
   constants?: Record<string, Constant>;
+  dashboards: Record<string, DashboardParser>;
+  dashboardId?: string;
 };
 
 type ResolveWidgetPropertyReferencesArguments = {
@@ -29,6 +31,8 @@ type ResolveWidgetPropertyReferencesArguments = {
   referencedWidgets: Record<string, Widget>;
   parameters?: Json;
   constants?: Record<string, Constant>;
+  dashboards: Record<string, DashboardParser>;
+  dashboardId?: string;
 }
 
 export {

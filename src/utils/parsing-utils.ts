@@ -66,10 +66,17 @@ function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {},
     dashboards[dashboardId] :
     Object.values(dashboards).find((dashboard) => {
       const parameterNames = dashboard.parameters.map(param => param.name).sort();
-      return (
-        dashboard.widgetIds.includes(widgetId) &&
-        difference(parameterKeys, parameterNames).length === 0
+      const dashboardUsesWidget = dashboard.widgetIds.includes(widgetId);
+      const dashboardDefinesAllPassesParams = difference(parameterKeys, parameterNames).length === 0;
+      const noParamsWerePassed = parameterKeys.length === 0;
+      const dashboardPredicateResult = (
+        dashboardUsesWidget &&
+        (
+          dashboardDefinesAllPassesParams ||
+          noParamsWerePassed
+        )
       );
+      return dashboardPredicateResult;
     });
 
   if (dashboardContext) {
