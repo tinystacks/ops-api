@@ -44,7 +44,9 @@ const WidgetClient = {
         providers,
         overrides,
         parameters: typeCastParameters,
-        constants
+        constants,
+        dashboards,
+        dashboardId
       });
       return hydratedWidget;
     } catch (error) {
@@ -113,7 +115,9 @@ const WidgetClient = {
       providers,
       overrides,
       parameters,
-      constants
+      constants,
+      dashboards,
+      dashboardId
     } = args;
     const referencedWidgets: Record<string, Widget> = {};
     const resolvedWidget = await this.resolveWidgetPropertyReferences({
@@ -122,7 +126,9 @@ const WidgetClient = {
       providers,
       referencedWidgets,
       parameters,
-      constants
+      constants,
+      dashboards,
+      dashboardId
     });
 
 
@@ -141,7 +147,9 @@ const WidgetClient = {
       providers,
       referencedWidgets,
       parameters = {},
-      constants = {}
+      constants = {},
+      dashboards,
+      dashboardId
     } = args;
     const parameterPrefix = '$param.';
     const constantPrefix = '$const.';
@@ -156,12 +164,23 @@ const WidgetClient = {
             providers,
             referencedWidgets,
             parameters,
-            constants
+            constants,
+            dashboards,
+            dashboardId
           });
         }
         return property;
       } else if ('$ref' in property) {
-        return await this.resolveWidgetPropertyReference({ property, widgets, providers, referencedWidgets, parameters, constants });
+        return await this.resolveWidgetPropertyReference({
+          property,
+          widgets,
+          providers,
+          referencedWidgets,
+          parameters,
+          constants,
+          dashboards,
+          dashboardId
+        });
       } else {
         for (const p in property) {
           property[p] = await this.resolveWidgetPropertyReferences({
@@ -170,7 +189,9 @@ const WidgetClient = {
             providers,
             referencedWidgets,
             parameters,
-            constants
+            constants,
+            dashboards,
+            dashboardId
           });
         }
       }
@@ -236,17 +257,25 @@ const WidgetClient = {
       providers,
       referencedWidgets,
       parameters = {},
-      constants = {}
+      constants = {},
+      dashboards,
+      dashboardId
     } = args;
     const widgetId = property.$ref.split('/')[3];
     const refWidget = widgets[widgetId];
     if (!referencedWidgets[refWidget.id]) {
+      let params = parameters;
+      if (Object.keys(parameters).length === 0) {
+        params = castParametersToDeclaredTypes(widgetId, parameters, dashboards, dashboardId);
+      }
       referencedWidgets[refWidget.id] = await this.hydrateWidgetReferences({
         widget: refWidget,
         widgets,
         providers,
-        parameters,
-        constants
+        parameters: params,
+        constants,
+        dashboards,
+        dashboardId
       });
     }
     const fullRefWidget = referencedWidgets[refWidget.id];
