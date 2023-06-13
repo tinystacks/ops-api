@@ -1,4 +1,3 @@
-import yaml from 'js-yaml';
 import isNil from 'lodash.isnil';
 import { ConsoleParser } from '@tinystacks/ops-core';
 import { Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
@@ -12,6 +11,7 @@ import { S3 } from '@aws-sdk/client-s3';
 import FsUtils from '../../utils/fs-utils.js';
 import IConsoleClient from './i-console-client.js';
 import { TMP_DIR } from '../../constants.js';
+import Yaml from '../../utils/yaml.js';
 
 type S3Info = {
   bucketName: string;
@@ -177,7 +177,7 @@ class S3ConsoleClient implements IConsoleClient {
        */
       const configFile = await this.getConfig();
       if (!configFile) throw HttpError.NotFound(`Cannot fetch console! Config file ${configPath} not found!`);
-      const configJson = (yaml.load(configFile.toString()) as any)?.Console as YamlConsole;
+      const configJson = Yaml.parseAs<YamlConsole>(configFile.toString());
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson)) {
         const consoleType: ConsoleType = ConsoleParser.parse(configJson);
@@ -200,7 +200,7 @@ class S3ConsoleClient implements IConsoleClient {
     const previousConsole = await this.getConsole(consoleName);
     console.providers = previousConsole.providers;
     const yamlConsole = await console.toYaml();
-    const consoleYml = yaml.dump({ Console: yamlConsole });
+    const consoleYml = Yaml.stringify({ Console: yamlConsole });
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot save console ${console.name}! No value was found for CONFIG_PATH!`);
     try {
