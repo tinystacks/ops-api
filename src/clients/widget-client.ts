@@ -4,14 +4,16 @@ import ConsoleClient from './console-client/index.js';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
 import get from 'lodash.get';
-import { Widget } from '@tinystacks/ops-model';
-import { BaseWidget } from '@tinystacks/ops-core';
+import { Widget as WidgetType } from '@tinystacks/ops-model';
+import { Widget as WidgetController, Models } from '@tinystacks/ops-core';
 import {
   GetWidgetArguments,
   HydrateWidgetReferencesArguments,
   ResolveWidgetPropertyReferencesArguments
 } from '../types/index.js';
 import { castParametersToDeclaredTypes, castToType } from '../utils/parsing-utils.js';
+
+import WidgetModel = Models.Widget;
 
 // TODO: should we make this a class that implement a WidgetClient interface?
 const WidgetClient = {
@@ -23,7 +25,7 @@ const WidgetClient = {
     }
     throw error;
   },
-  async getWidget (args: GetWidgetArguments): Promise<BaseWidget> {
+  async getWidget (args: GetWidgetArguments): Promise<WidgetController> {
     try {
       const {
         consoleName,
@@ -34,9 +36,10 @@ const WidgetClient = {
       } = args;
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
-      const widget: BaseWidget = console.widgets[widgetId];
-      if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
-      const { widgets, providers, dashboards = {}, constants = {} } = console;
+      const widget: WidgetController = console.widgets[widgetId] as WidgetController;
+      if (isNil(widget)) throw HttpError.NotFound(`WidgetType with id ${widgetId} does not exist on console ${consoleName}!`);
+      const { widgets: ws, providers, dashboards = {}, constants = {} } = console;
+      const widgets = ws as { [id: string]: WidgetController };
       const typeCastParameters = castParametersToDeclaredTypes(widgetId, parameters, dashboards, dashboardId);
       const hydratedWidget = await this.hydrateWidgetReferences({
         widget,
@@ -53,7 +56,7 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
-  async createWidget (consoleName: string, widget: Widget): Promise<BaseWidget> {
+  async createWidget (consoleName: string, widget: WidgetType): Promise<WidgetController> {
     try {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
@@ -63,7 +66,7 @@ const WidgetClient = {
       if (existingWidget) throw HttpError.Conflict(`Cannot create new widget with id ${widget.id} because a widget with this id already exists on console ${consoleName}!`);
       // Filter out any junk from the request
       const widgetDependencySource = console.dependencies[widget.type];
-      const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
+      const widgetInstance = await WidgetModel.fromJson(widget, widgetDependencySource);
       const newWidget = widgetInstance.toJson();
       await console.addWidget(newWidget, widgetId);
       await consoleClient.saveConsole(consoleName, console);
@@ -72,7 +75,7 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
-  async updateWidget (consoleName: string, widgetId: string, widget: Widget): Promise<BaseWidget> {
+  async updateWidget (consoleName: string, widgetId: string, widget: WidgetType): Promise<WidgetController> {
     try {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
@@ -82,7 +85,7 @@ const WidgetClient = {
       widget.id = widgetId;
       // Filter out any junk from the request
       const widgetDependencySource = console.dependencies[widget.type];
-      const widgetInstance = await BaseWidget.fromJson(widget, widgetDependencySource);
+      const widgetInstance = await WidgetModel.fromJson(widget, widgetDependencySource);
       const updatedWidget = widgetInstance.toJson();
       await console.updateWidget(updatedWidget, widgetId);
       await consoleClient.saveConsole(console.name, console);
@@ -91,11 +94,11 @@ const WidgetClient = {
       return this.handleError(error);
     }
   },
-  async deleteWidget (consoleName: string, widgetId: string): Promise<BaseWidget> {
+  async deleteWidget (consoleName: string, widgetId: string): Promise<WidgetController> {
     try {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
-      const existingWidget = console.widgets[widgetId];
+      const existingWidget = console.widgets[widgetId] as WidgetController;
       if (isNil(existingWidget)) throw HttpError.NotFound(`Cannot delete widget with id ${widgetId} because this widget does not exist on console ${consoleName}!`);
       console.deleteWidget(widgetId);
       await consoleClient.saveConsole(console.name, console);
@@ -108,7 +111,7 @@ const WidgetClient = {
   //   recursively for every ref:
   //      recA
   //      resolve ref by calling getData
-  async hydrateWidgetReferences (args: HydrateWidgetReferencesArguments) {
+  async hydrateWidgetReferences (args: HydrateWidgetReferencesArguments): Promise<WidgetController> {
     const {
       widget,
       widgets,
@@ -119,7 +122,7 @@ const WidgetClient = {
       dashboards,
       dashboardId
     } = args;
-    const referencedWidgets: Record<string, Widget> = {};
+    const referencedWidgets: Record<string, WidgetType> = {};
     const resolvedWidget = await this.resolveWidgetPropertyReferences({
       property: widget,
       widgets,
@@ -132,7 +135,7 @@ const WidgetClient = {
     });
 
 
-    const hydratedProviders = ((resolvedWidget as Widget).providerIds || []).map((providerId: string) => {
+    const hydratedProviders = ((resolvedWidget as WidgetType).providerIds || []).map((providerId: string) => {
       return providers[providerId];
     });
     await widget.getData(hydratedProviders, overrides, parameters);

@@ -1,5 +1,5 @@
 import isNil from 'lodash.isnil';
-import { ConsoleParser } from '@tinystacks/ops-core';
+import { Console } from '@tinystacks/ops-core';
 import { Config, Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
 import HttpError from 'http-errors';
 import {
@@ -13,7 +13,7 @@ import IConsoleClient from './i-console-client.js';
 import Yaml from '../../utils/yaml.js';
 
 class LocalConsoleClient implements IConsoleClient {
-  async getConsole (_consoleName?: string): Promise<ConsoleParser> {
+  async getConsole (_consoleName?: string): Promise<Console> {
     const configPath = process.env.CONFIG_PATH;
     if (configPath) {
       const configFilePath = resolvePath(configPath);
@@ -23,20 +23,20 @@ class LocalConsoleClient implements IConsoleClient {
       const configJson = Yaml.parseAs<Config>(configFile.toString());
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson.Console)) {
-        const consoleType: ConsoleType = ConsoleParser.parse(configJson.Console as YamlConsole);
-        return ConsoleParser.fromJson(consoleType);
+        const consoleType: ConsoleType = Console.parse(configJson.Console as YamlConsole);
+        return Console.fromJson(consoleType);
       }
       throw HttpError.InternalServerError('Cannot fetch console! The contents of the config file was empty or invalid!');
     }
     throw HttpError.InternalServerError('Cannot fetch console! No value was found for CONFIG_PATH!');
   }
-  async getConsoles (): Promise<ConsoleParser[]> {
+  async getConsoles (): Promise<Console[]> {
     const consoles = [];
     const console = await this.getConsole();
     if (console) consoles.push(console);
     return consoles;
   }
-  async saveConsole (consoleName: string, console: ConsoleParser): Promise<ConsoleParser> {
+  async saveConsole (consoleName: string, console: Console): Promise<Console> {
     console.name = consoleName;
     const previousConsole = await this.getConsole(consoleName);
     console.providers = previousConsole.providers;
@@ -53,7 +53,7 @@ class LocalConsoleClient implements IConsoleClient {
       throw error;
     }
   }
-  async deleteConsole (consoleName: string): Promise<ConsoleParser> {
+  async deleteConsole (consoleName: string): Promise<Console> {
     const configPath = process.env.CONFIG_PATH;
     if (isNil(configPath)) throw HttpError.InternalServerError(`Cannot delete console ${consoleName}! No value was found for CONFIG_PATH!`);
     try {

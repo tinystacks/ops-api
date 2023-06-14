@@ -3,8 +3,8 @@ import HttpError from 'http-errors';
 import ConsoleClient from './console-client/index.js';
 import upperFirst from 'lodash.upperfirst';
 import camelCase from 'lodash.camelcase';
-import { Dashboard } from '@tinystacks/ops-model';
-import { ConsoleParser, DashboardParser } from '@tinystacks/ops-core';
+import { Dashboard as DashboardType } from '@tinystacks/ops-model';
+import { Console, Dashboard } from '@tinystacks/ops-core';
 
 const DashboardClient = {
   handleError (error: unknown): never {
@@ -15,18 +15,18 @@ const DashboardClient = {
     }
     throw error;
   },
-  async getDashboard (consoleName: string, dashboardId: string): Promise<DashboardParser> { //should return a dashboardParser
+  async getDashboard (consoleName: string, dashboardId: string): Promise<Dashboard> { //should return a dashboardParser
     try {
       const consoleClient = new ConsoleClient();
-      const console : ConsoleParser = await consoleClient.getConsole(consoleName);
+      const console : Console = await consoleClient.getConsole(consoleName);
       const existingDashboard = console.dashboards[dashboardId];
-      if (!existingDashboard) throw HttpError.NotFound(`Dashboard with id ${dashboardId} does not exist in console ${consoleName}!`);
+      if (!existingDashboard) throw HttpError.NotFound(`DashboardType with id ${dashboardId} does not exist in console ${consoleName}!`);
       return existingDashboard;
     } catch (error) {
       return this.handleError(error);
     }
   },
-  async getDashboards (consoleName: string): Promise<DashboardParser[]> {
+  async getDashboards (consoleName: string): Promise<Dashboard[]> {
     try {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
@@ -35,7 +35,7 @@ const DashboardClient = {
       return this.handleError(error);
     }
   },
-  async createDashboard (consoleName: string, dashboard: Dashboard): Promise<DashboardParser> {
+  async createDashboard (consoleName: string, dashboard: DashboardType): Promise<Dashboard> {
     try {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
@@ -53,10 +53,10 @@ const DashboardClient = {
       return this.handleError(error);
     }
   },
-  async updateDashboard (consoleName: string, dashboardId: string, dashboard: Dashboard): Promise<DashboardParser> {
+  async updateDashboard (consoleName: string, dashboardId: string, dashboard: DashboardType): Promise<Dashboard> {
     try {
       const consoleClient = new ConsoleClient();
-      const console: ConsoleParser = await consoleClient.getConsole(consoleName);
+      const console: Console = await consoleClient.getConsole(consoleName);
       const existingDashboard = console.dashboards[dashboardId];
       if (isNil(existingDashboard)) throw HttpError.NotFound(`Cannot update dashboard with id ${dashboardId} because this dashboard does not exist on console ${consoleName}!`);
       // No trickery allowed.
@@ -68,7 +68,7 @@ const DashboardClient = {
       return this.handleError(error);
     }
   },
-  async deleteDashboard (consoleName: string, dashboardId: string): Promise<DashboardParser> {
+  async deleteDashboard (consoleName: string, dashboardId: string): Promise<Dashboard> {
     try {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
