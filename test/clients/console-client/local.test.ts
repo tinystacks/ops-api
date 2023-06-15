@@ -106,7 +106,7 @@ describe('local console client tests', () => {
       expect(mockLoad).toBeCalledWith('Console: ');
       expect(result).toEqual(mockConsole);
     });
-    it.only('throws InternalServerError if yaml cannot be loaded', async () => {
+    it('throws InternalServerError if yaml cannot be loaded', async () => {
       const mockConfigPath = './mock.yml';
       process.env.CONFIG_PATH = mockConfigPath;
       mockResolve.mockReturnValueOnce(mockConfigPath);
