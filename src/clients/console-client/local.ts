@@ -22,7 +22,7 @@ class LocalConsoleClient implements IConsoleClient {
       if (!configFile) throw HttpError.NotFound(`Cannot fetch console! Config file ${configPath} not found!`);
       const configJson = Yaml.parseAs<Config>(configFile.toString());
       // console.debug('configJson: ', JSON.stringify(configJson));
-      if (!isNil(configJson.Console)) {
+      if (!isNil(configJson?.Console)) {
         const consoleType: ConsoleType = Console.parse(configJson.Console as YamlConsole);
         return Console.fromJson(consoleType);
       }

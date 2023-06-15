@@ -37,7 +37,7 @@ const WidgetClient = {
       const consoleClient = new ConsoleClient();
       const console = await consoleClient.getConsole(consoleName);
       const widget: WidgetController = console.widgets[widgetId] as WidgetController;
-      if (isNil(widget)) throw HttpError.NotFound(`WidgetType with id ${widgetId} does not exist on console ${consoleName}!`);
+      if (isNil(widget)) throw HttpError.NotFound(`Widget with id ${widgetId} does not exist on console ${consoleName}!`);
       const { widgets: ws, providers, dashboards = {}, constants = {} } = console;
       const widgets = ws as { [id: string]: WidgetController };
       const typeCastParameters = castParametersToDeclaredTypes(widgetId, parameters, dashboards, dashboardId);

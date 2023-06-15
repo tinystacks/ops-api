@@ -1,6 +1,6 @@
 import isNil from 'lodash.isnil';
 import { Console } from '@tinystacks/ops-core';
-import { Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
+import { Config, Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
 import HttpError from 'http-errors';
 import {
   mkdirSync,
@@ -177,10 +177,10 @@ class S3ConsoleClient implements IConsoleClient {
        */
       const configFile = await this.getConfig();
       if (!configFile) throw HttpError.NotFound(`Cannot fetch console! Config file ${configPath} not found!`);
-      const configJson = Yaml.parseAs<YamlConsole>(configFile.toString());
+      const configJson = Yaml.parseAs<Config>(configFile.toString());
       // console.debug('configJson: ', JSON.stringify(configJson));
-      if (!isNil(configJson)) {
-        const consoleType: ConsoleType = Console.parse(configJson);
+      if (!isNil(configJson?.Console)) {
+        const consoleType: ConsoleType = Console.parse(configJson?.Console as YamlConsole);
         return Console.fromJson(consoleType);
       }
       throw HttpError.InternalServerError('Cannot fetch console! The contents of the config file was empty or invalid!');

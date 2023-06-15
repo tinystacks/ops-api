@@ -7,8 +7,8 @@ jest.mock('../../src/clients/console-client/index.js', () => mockConsoleClient);
 import WidgetClient from '../../src/clients/widget-client.js';
 import HttpError from 'http-errors';
 import { BasicWidget } from '../utils/basic-widget.js';
-import { ConsoleParser } from '@tinystacks/ops-core';
-import { Widget, Console, Parameter } from '@tinystacks/ops-model';
+import { Console } from '@tinystacks/ops-core';
+import { Widget, Console as ConsoleType, Parameter } from '@tinystacks/ops-model';
 
 const basicConsole = {
   name: 'mock-console',
@@ -23,7 +23,7 @@ const basicWidget: Widget = {
   displayName: 'Mock Widget',
   type: 'BasicWidget'
 };
-const basicConsoleWithWidget: Console = {
+const basicConsoleWithWidget: ConsoleType = {
   ...basicConsole,
   widgets: {
     [basicWidget.id]: basicWidget
@@ -96,7 +96,7 @@ describe('widget client tests', () => {
   describe('getWidget', () => {
     it('returns widget from console matching the id specified', async () => {
       const mockWidget = basicWidget;
-      const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
+      const mockConsole = await Console.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       const result = await WidgetClient.getWidget({
         consoleName: basicConsoleWithWidget.name,
@@ -106,7 +106,7 @@ describe('widget client tests', () => {
       expect(result).toEqual(mockWidget);
     });
     it('throws not found if widget does not exist on the console', async () => {
-      const mockConsole = ConsoleParser.fromJson(basicConsole);
+      const mockConsole = Console.fromJson(basicConsole);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
       let thrownError;
@@ -249,7 +249,7 @@ describe('widget client tests', () => {
   describe('getWidgets', () => {
     it('returns widgets from console', async () => {
       const mockWidget = BasicWidget.fromJson(basicWidget);
-      const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
+      const mockConsole = await Console.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
       const result = await WidgetClient.getWidget({
@@ -280,11 +280,11 @@ describe('widget client tests', () => {
   describe('createWidget', () => {
     it('saves widget to console and returns saved widget', async () => {
       const mockWidget = BasicWidget.fromJson(basicWidget);
-      const mockConsole = await ConsoleParser.fromJson({
+      const mockConsole = await Console.fromJson({
         ...basicConsole,
         dependencies: { ...basicConsoleWithWidget.dependencies }
       });
-      const mockSavedConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
+      const mockSavedConsole = await Console.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       mockGetConsole.mockResolvedValueOnce(mockSavedConsole);
       const result = await WidgetClient.createWidget('mock-console', mockWidget);
@@ -301,7 +301,7 @@ describe('widget client tests', () => {
 
     it('throws Conflict if widget already exists on console', async () => {
       const mockWidget = BasicWidget.fromJson(basicWidget);
-      const mockConsole = ConsoleParser.fromJson(basicConsoleWithWidget);
+      const mockConsole = Console.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       let thrownError;
       try {
@@ -323,7 +323,7 @@ describe('widget client tests', () => {
   describe('updateWidget', () => {
     it('saves widget to console and returns saved widget', async () => {
       const oldMockWidget = BasicWidget.fromJson(basicWidget);
-      const oldMockConsole = await ConsoleParser.fromJson({
+      const oldMockConsole = await Console.fromJson({
         ...basicConsoleWithWidget,
         widgets: {
           [oldMockWidget.id]: oldMockWidget
@@ -333,7 +333,7 @@ describe('widget client tests', () => {
         ...basicWidget,
         displayName: 'Mock Widget 2'
       });
-      const newMockConsole = await ConsoleParser.fromJson({
+      const newMockConsole = await Console.fromJson({
         ...basicConsoleWithWidget,
         widgets: {
           [newMockWidget.id]: newMockWidget
@@ -350,7 +350,7 @@ describe('widget client tests', () => {
     });
     it('throws NotFound if widget does not exist on console', async () => {
       const mockWidget = BasicWidget.fromJson(basicWidget);
-      const mockConsole = await ConsoleParser.fromJson(basicConsole);
+      const mockConsole = await Console.fromJson(basicConsole);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
       let thrownError;
       try {
@@ -372,7 +372,7 @@ describe('widget client tests', () => {
   describe('deleteWidget', () => {
     it('deletes widget from console and returns deleted widget', async () => {
       const mockWidget = BasicWidget.fromJson(basicWidget);
-      const mockConsole = await ConsoleParser.fromJson(basicConsoleWithWidget);
+      const mockConsole = await Console.fromJson(basicConsoleWithWidget);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
       const result = await WidgetClient.deleteWidget('mock-console', basicWidget.id);
@@ -382,7 +382,7 @@ describe('widget client tests', () => {
       expect(result).toEqual(mockWidget);
     });
     it('throws NotFound if widget does not exist on console', async () => {
-      const mockConsole = await ConsoleParser.fromJson(basicConsole);
+      const mockConsole = await Console.fromJson(basicConsole);
       mockGetConsole.mockResolvedValueOnce(mockConsole);
 
       let thrownError;
