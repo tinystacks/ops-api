@@ -12,11 +12,11 @@ jest.mock('../../../src/clients/console-client/local.js', () => ({
   LocalConsoleClient: mockLocalClient
 }));
 
-import { ConsoleParser } from '@tinystacks/ops-core';
+import { Console } from '@tinystacks/ops-core';
 import ConsoleClient from '../../../src/clients/console-client/index.js';
 
 async function getMockConsole () {
-  return await ConsoleParser.fromJson({
+  return await Console.fromJson({
     name: 'mock-console',
     dashboards: {},
     providers: {},

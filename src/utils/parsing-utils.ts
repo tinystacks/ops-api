@@ -1,5 +1,5 @@
 import { Constant, Parameter } from '@tinystacks/ops-model';
-import { DashboardParser } from '@tinystacks/ops-core';
+import { Dashboard } from '@tinystacks/ops-core';
 import { Json } from '../types/index.js';
 import difference from 'lodash.difference';
 
@@ -60,7 +60,7 @@ function castToType (value: any, type: Constant.type | Parameter.type | string) 
   }
 }
 
-function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {}, dashboards: Record<string, DashboardParser> = {}, dashboardId?: string): Json {
+function castParametersToDeclaredTypes (widgetId: string, parameters: Json = {}, dashboards: Record<string, Dashboard> = {}, dashboardId?: string): Json {
   const parameterKeys = Object.keys(parameters).sort();
   const dashboardContext = dashboardId ?
     dashboards[dashboardId] :

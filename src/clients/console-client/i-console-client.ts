@@ -1,10 +1,10 @@
-import { ConsoleParser } from '@tinystacks/ops-core';
+import { Console } from '@tinystacks/ops-core';
 
 interface IConsoleClient {
-  getConsoles (): Promise<ConsoleParser[]>;
-  getConsole (consoleName: string): Promise<ConsoleParser>;
-  saveConsole (consoleName: string, console: ConsoleParser): Promise<ConsoleParser>;
-  deleteConsole (consoleName: string): Promise<ConsoleParser>;
+  getConsoles (): Promise<Console[]>;
+  getConsole (consoleName: string): Promise<Console>;
+  saveConsole (consoleName: string, console: Console): Promise<Console>;
+  deleteConsole (consoleName: string): Promise<Console>;
 }
 
 export {

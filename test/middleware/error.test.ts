@@ -40,7 +40,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(418);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith({ status: 418, message: 'mock-error' });
+    expect(mockJson).toBeCalledWith(TinyStacksError.fromJson(mockError));
     expect(mockNext).toBeCalled();
   });
 
@@ -49,7 +49,7 @@ describe('error middleware tests', () => {
       name: 'TinyStacksError',
       status: 418,
       message: 'mock-error',
-      type: TinyStacksErrorType.type.VALIDATION
+      type: 'Validation'
     });
 
     await errorMiddleware(mockError, mockRequest, mockResponse, mockNext);
@@ -59,7 +59,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(418);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith({ status: 418, message: 'mock-error' });
+    expect(mockJson).toBeCalledWith(mockError);
     expect(mockNext).toBeCalled();
   });
 
@@ -78,7 +78,7 @@ describe('error middleware tests', () => {
     expect(mockStatus).toBeCalled();
     expect(mockStatus).toBeCalledWith(418);
     expect(mockJson).toBeCalled();
-    expect(mockJson).toBeCalledWith({ status: 418, message: 'mock-error' });
+    expect(mockJson).toBeCalledWith(mockError);
     expect(mockNext).toBeCalled();
   });
 

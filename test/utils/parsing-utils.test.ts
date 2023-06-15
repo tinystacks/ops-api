@@ -1,4 +1,4 @@
-import { DashboardParser } from '@tinystacks/ops-core';
+import { Dashboard } from '@tinystacks/ops-core';
 import {
   castParametersToDeclaredTypes,
   castToType,
@@ -137,7 +137,7 @@ describe('parsing-utils', () => {
           }
         ]
       }
-    } as unknown as Record<string, DashboardParser>;
+    } as unknown as Record<string, Dashboard>;
 
     it('returns empty object if there are no parameters', () => {
       const result = castParametersToDeclaredTypes('MockWidget');

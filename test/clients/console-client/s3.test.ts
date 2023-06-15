@@ -31,13 +31,13 @@ jest.mock('@aws-sdk/client-s3', () => ({
 
 const mockGetConsole = jest.fn();
 
-import { Console } from '@tinystacks/ops-model';
+import { Console as ConsoleType } from '@tinystacks/ops-model';
 import S3ConsoleClient from '../../../src/clients/console-client/s3';
 import HttpError from 'http-errors';
-import { ConsoleParser } from '@tinystacks/ops-core';
+import { Console } from '@tinystacks/ops-core';
 
 const mockConsoleName = 'mock-console';
-const mockConsoleJson: Console = {
+const mockConsoleJson: ConsoleType = {
   name: mockConsoleName,
   constants: {},
   dashboards: {},
@@ -230,7 +230,7 @@ describe('local console client tests', () => {
   });
   describe('getConsoles', () => {
     it('returns array of console if one exists', async () => {
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
       jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
 
       const result = await s3ConsoleClient.getConsoles();
@@ -250,7 +250,7 @@ describe('local console client tests', () => {
   });
   describe('saveConsole', () => {
     it('throws InternalServerError if CONFIG_PATH is not set', async () => {
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
       jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
       let thrownError;
       try {
@@ -263,9 +263,9 @@ describe('local console client tests', () => {
         expect(thrownError).toEqual(HttpError.InternalServerError('Cannot save console mock-console! No value was found for CONFIG_PATH!'));
       }
     });
-    it('writes to file and returns saved Console on success', async () => {
+    it('writes to file and returns saved ConsoleType on success', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockUser}/${mockConfigFileName}`;
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
 
       process.env.CONFIG_PATH = mockConfigPath;
       mockDump.mockReturnValueOnce(mockConfigYaml);
@@ -299,7 +299,7 @@ describe('local console client tests', () => {
     });
     it('logs and re-throws errors', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockUser}/${mockConfigFileName}`;
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
       jest.spyOn(S3ConsoleClient.prototype, 'getConsole').mockResolvedValue(mockConsole);
       const mockError = new Error();
       process.env.CONFIG_PATH = mockConfigPath;
@@ -338,7 +338,7 @@ describe('local console client tests', () => {
     });
     it('deletes all objects in the directory if config file has a parent directory', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockUser}/${mockConfigFileName}`;
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
       process.env.CONFIG_PATH = mockConfigPath;
       mockListObjectsV2.mockResolvedValueOnce({
         Contents: [
@@ -385,7 +385,7 @@ describe('local console client tests', () => {
     });
     it('deletes single object if config file does not have a parent directory', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockUser}/${mockConfigFileName}`;
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
       process.env.CONFIG_PATH = mockConfigPath;
       mockListObjectsV2.mockResolvedValueOnce({
         Contents: [
@@ -432,7 +432,7 @@ describe('local console client tests', () => {
     });
     it('logs and re-throws errors', async () => {
       const mockConfigPath = `s3://${mockConfigBucket}/${mockUser}/${mockConfigFileName}`;
-      const mockConsole = await ConsoleParser.fromJson(mockConsoleJson);
+      const mockConsole = await Console.fromJson(mockConsoleJson);
       const mockError = new Error();
       process.env.CONFIG_PATH = mockConfigPath;
       mockListObjectsV2.mockImplementationOnce(() => { throw mockError; });
