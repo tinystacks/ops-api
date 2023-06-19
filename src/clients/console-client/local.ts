@@ -1,6 +1,6 @@
 import isNil from 'lodash.isnil';
 import { ConsoleParser } from '@tinystacks/ops-core';
-import { Config, Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
+import { Config, Console as ConsoleType } from '@tinystacks/ops-model';
 import HttpError from 'http-errors';
 import {
   writeFileSync
