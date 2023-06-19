@@ -1,6 +1,6 @@
 import isNil from 'lodash.isnil';
 import { ConsoleParser } from '@tinystacks/ops-core';
-import { Config, Console as ConsoleType } from '@tinystacks/ops-model';
+import { Config, Console as ConsoleType, YamlConsole } from '@tinystacks/ops-model';
 import HttpError from 'http-errors';
 import {
   writeFileSync
@@ -23,7 +23,7 @@ class LocalConsoleClient implements IConsoleClient {
       const configJson = Yaml.parseAs<Config>(configFile.toString());
       // console.debug('configJson: ', JSON.stringify(configJson));
       if (!isNil(configJson?.Console)) {
-        const consoleType: ConsoleType = ConsoleParser.parse(configJson?.Console);
+        const consoleType: ConsoleType = ConsoleParser.parse(configJson?.Console as YamlConsole);
         return ConsoleParser.fromJson(consoleType);
       }
       throw HttpError.InternalServerError('Cannot fetch console! The contents of the config file was empty or invalid!');
