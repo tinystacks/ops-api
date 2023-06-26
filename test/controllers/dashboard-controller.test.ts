@@ -46,15 +46,12 @@ describe('dashboard controller tests', () => {
       widgetIds: [],
       parameters: []
     };
-    await DashboardController.putDashboard('mock-console', '/mock-dashboard-2', requestBody);
+    await DashboardController.putDashboard('mock-console', 'mock-dashboard', requestBody);
     expect(mockUpdateDashboard).toBeCalled();
     expect(mockUpdateDashboard).toBeCalledWith(
       'mock-console',
-      '/mock-dashboard-2',
-      {
-        ...requestBody,
-        route: '/mock-dashboard-2'
-      }
+      'mock-dashboard',
+      requestBody
     );
   });
   it('deleteDashboard', async () => {
