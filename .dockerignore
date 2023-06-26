@@ -5,6 +5,7 @@ cdk
 node_modules
 scripts
 test
+coverage
 Dockerfile
 dev.sh
 docker-build.sh
