@@ -21,6 +21,7 @@ if [[ "$ARCH" == "arm" ]];
     ./aws/install \
     || exit 1;
 fi
+rm awscliv2.zip
 
 echo Y | apt-get install dpkg || exit 1
 

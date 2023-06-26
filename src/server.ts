@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import { initialize } from 'express-openapi';
-import yaml from 'yamljs';
+import yaml from 'js-yaml';
 import { readFileSync, rmSync } from 'fs';
 import path, { resolve } from 'path';
 import { resolveRefsAt } from 'json-refs';
@@ -61,12 +61,12 @@ async function startServer () {
   console.debug('Constructing the swagger docs and open api spec.');
   const rootDocLocation = require.resolve('@tinystacks/ops-model/src/index.yml');
   console.debug('rootDocLocation: ', rootDocLocation);
-  const apiDoc = yaml.parse(readFileSync(rootDocLocation, 'utf-8'));
+  const apiDoc = yaml.load(readFileSync(rootDocLocation, 'utf-8')) as any;
 
   const swaggerSpec = await resolveRefsAt(rootDocLocation,  {
     loaderOptions : {
       processContent: (res: any, callback: any) => {
-        callback(null, yaml.parse(res.text));
+        callback(null, yaml.load(res.text));
       }
     }
   });
